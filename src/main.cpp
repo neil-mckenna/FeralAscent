@@ -1,4 +1,9 @@
 #include <SFML/Graphics.hpp>
+#include "../lib/box2d/include/box2d/b2_world.h"
+
+
+
+b2World* world;
 
 int main() {
     // Create a render window with specified size and title

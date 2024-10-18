@@ -84,6 +84,13 @@ target_link_libraries(FeralAscent
 )
 
 
+# Box2D 
+add_subdirectory("lib/box2d/")
+#include_directories("lib/b2d/Box2D/")
+set(B2D_INCS "lib/box2d/include/box2d/")
+link_directories("${CMAKE_BINARY_DIR}/../lib/sfml/lib")
+
+
 
 
 # Check if SFML_LIBRARY_DIR is defined and link libraries
