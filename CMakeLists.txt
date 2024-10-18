@@ -16,6 +16,10 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 #### Setup Directories ####
 
+# Define a variable for the SFML directory
+#not working
+#set(SFML_DIR ${CMAKE_CURRENT_SOURCE_DIR}/libs/sfml/lib)
+
 # Main output directory for the binaries
 set(OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/")
 
@@ -38,12 +42,15 @@ set(SFML_LIBRARIES
 )
 
 # Check if SFML include directory is found
-#if(NOT EXISTS ${SFML_INCLUDE_DIR})
-#    message(FATAL_ERROR "SFML_INCLUDE_DIR not found: ${SFML_INCLUDE_DIR}")
-#else()
-#    message(STATUS "SFML_INCLUDE_DIR found: ${SFML_INCLUDE_DIR}")
-#    include_directories(${SFML_INCLUDE_DIR})  # Add include directory
-#endif()
+if(NOT EXISTS ${SFML_INCLUDE_DIR})
+    message(FATAL_ERROR "SFML_INCLUDE_DIR not found: ${SFML_INCLUDE_DIR}")
+else()
+    message(STATUS "SFML_INCLUDE_DIR found: ${SFML_INCLUDE_DIR}")
+    include_directories(${SFML_INCLUDE_DIR})  # Add include directory
+endif()
+
+
+
 
 # Check if SFML library directory is found
 #if(NOT EXISTS ${SFML_LIBRARY_DIR})
@@ -54,11 +61,30 @@ set(SFML_LIBRARIES
 #endif()
 
 
-# Include custom library (if applicable)
+# Include custom static library (if applicable)
 add_subdirectory(blah/src)
 
 # Add executable
 add_executable(FeralAscent ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp)
+
+
+# Add multiple library directories
+#C:/Users/jakes/OneDrive/Desktop/Feral_Ascent/lib/sfml
+target_link_directories(FeralAscent PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/lib/sfml/lib)
+#link_directories(${CMAKE_BINARY_DIR}/../lib/sfml/lib)
+
+
+# update the linker additional 
+target_link_libraries(FeralAscent
+  sfml-graphics
+  sfml-window
+  sfml-system
+  sfml-audio
+  sfml-network
+)
+
+
+
 
 # Check if SFML_LIBRARY_DIR is defined and link libraries
 #if(SFML_LIBRARY_DIR)
