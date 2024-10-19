@@ -74,6 +74,20 @@ target_link_directories(FeralAscent PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/lib/sfml
 #link_directories(${CMAKE_BINARY_DIR}/../lib/sfml/lib)
 
 
+# Box2D
+# Add Box2D as a subdirectory 
+add_subdirectory("lib/box2d/")
+
+# Include Box2D headers
+include_directories("lib/box2d/include")
+
+set(B2D_INCS "lib/box2d/include/box2d/")
+
+# Set the SFML library path
+link_directories("${CMAKE_BINARY_DIR}/../lib/sfml/lib")
+
+
+
 # update the linker additional 
 target_link_libraries(FeralAscent
   sfml-graphics
@@ -81,14 +95,8 @@ target_link_libraries(FeralAscent
   sfml-system
   sfml-audio
   sfml-network
+  box2d
 )
-
-
-# Box2D 
-add_subdirectory("lib/box2d/")
-#include_directories("lib/b2d/Box2D/")
-set(B2D_INCS "lib/box2d/include/box2d/")
-link_directories("${CMAKE_BINARY_DIR}/../lib/sfml/lib")
 
 
 
