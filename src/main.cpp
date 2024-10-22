@@ -1,6 +1,7 @@
 #include <SFML/Graphics.hpp>
 #include <box2d/box2d.h>
 #include <box2d/b2_world.h>
+#include <iostream>
 
 using namespace sf;
 using namespace std;
@@ -24,8 +25,8 @@ const float physics_scale = 30.0f;
 // inverse of physics_scale, useful for calculations
 const float physics_scale_inv = 1.0f / physics_scale;
 // Magic numbers for accuracy of physics simulation
-const int32 velocityIterations = 6;
-const int32 positionIterations = 2;
+const int32 velocityIterations = 8; // Increased from 6
+const int32 positionIterations = 3; // Increased from 2
 
 //Convert from b2Vec2 to a Vector2f
 inline const Vector2f bv2_to_sv2(const b2Vec2& in) {
@@ -53,15 +54,21 @@ b2Body* CreatePhysicsBox(b2World& World, const bool dynamic, const Vector2f& pos
 
     //Create the fixture shape
     b2PolygonShape Shape;
-    Shape.SetAsBox(sv2_to_bv2(size).x * 0.5f, sv2_to_bv2(size).y * 0.5f);
+    Shape.SetAsBox(sv2_to_bv2(size).x * 0.55f, sv2_to_bv2(size).y * 0.55f);
     b2FixtureDef FixtureDef;
     //Fixture properties
     FixtureDef.density = dynamic ? 10.f : 0.f;
     FixtureDef.friction = dynamic ? 0.8f : 1.f;
     FixtureDef.restitution = 1.0;
     FixtureDef.shape = &Shape;
+
+
     //Add to body
     body->CreateFixture(&FixtureDef);
+    //
+    body->SetBullet(true);
+    body->SetSleepingAllowed(false);
+
     return body;
 }
 
@@ -102,38 +109,49 @@ void Init()
         // Top
         Vector2f(gameWidth * .5f, 5.f), Vector2f(gameWidth, 10.f),
         // Bottom
-        Vector2f(gameWidth * .5f, gameHeight - 5.f), Vector2f(gameWidth, 10.f),
+        Vector2f(gameWidth * .5f, gameHeight - 15.f), Vector2f(gameWidth, 10.f),
         // left
         Vector2f(5.f, gameHeight * .5f), Vector2f(10.f, gameHeight),
         // right
-        Vector2f(gameWidth - 5.f, gameHeight * .5f), Vector2f(10.f, gameHeight)
+        Vector2f(gameWidth - 15.f, gameHeight * .5f), Vector2f(10.f, gameHeight)
     };
 
     // Build Walls
     for (int i = 0; i < 7; i += 2) {
         // Create SFML shapes for each wall
-        auto s = new RectangleShape();
+        auto s = new RectangleShape(Vector2f(10.0f, 10.0f));
+
+        cout << "Index number " << i << endl;
+        cout << walls[i].x << " | " << walls[i].y << endl;
+
         s->setPosition(walls[i]);
+        s->setFillColor(Color::Red);
 
-        // set origin to center
-        //s->setOrigin(Vector2f(25.0f, 25.0f));
-
-        // set size and thickness of walls ?
-        //s->setSize(Vector2f(walls[i].x, walls[i].y));
-        s->setSize(Vector2f(walls[i].x * 1.0f, walls[i].y * 1.0f));
+        if (i <= 2) // top and bottom
+        {
+            s->setPosition(Vector2f(0, walls[i].y));
+            s->setSize(Vector2f(gameWidth, 5.0f * 2));
+        }
+        else // left and right
+        {
+            s->setPosition(Vector2f(walls[i].x, gameHeight - (5.0f * 2)));
+            s->setSize(Vector2f(5.0f * 2, gameHeight));
+        }
 
         // add back to sprites array for drawing
         sprites.push_back(s);
 
-        // Create a static physics body for the wall
-        CreatePhysicsBox(*world, false, *s);
+        // create static walls
+        auto body = CreatePhysicsBox(*world, false, *s);
 
+        bodies.push_back(body);
     }
 
-    // Create Boxes // world / static? / pos / size
-    //auto b = CreatePhysicsBox(*world, false, Vector2f(walls[0].x, walls[0].y), Vector2f(10.0f, 10.0f));
+    // Create Boxes confused as we create boxes or is this boxes for walls
+    //auto b = CreatePhysicsBox(*world, false, );
 
     //bodies.push_back(b);
+
 }
 #pragma endregion
 
@@ -152,7 +170,9 @@ void Update() {
         // Sync Sprites to physics Rotation
         sprites[i]->setRotation((180 / b2_pi) * bodies[i]->GetAngle());
     }
+
 }
+
 #pragma endregion
 
 #pragma region Green_Circle
