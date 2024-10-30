@@ -1,0 +1,106 @@
+# Visual Studio
+.vscode/
+.vs/
+*.code-workspace
+
+# Windows-specific
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# Compiled Object files
+*.obj
+*.o
+*.lo
+*.la
+*.al
+*.libs
+*.so
+*.dll
+*.dylib
+*.exe
+*.out
+*.app
+*.iobj
+*.ipdb
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Libraries
+*.lib
+*.a
+*.lai
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+CMakeScripts/
+Testing/
+CTestTestfile.cmake
+Makefile
+build/
+*.cmake
+
+# Visual Studio Code and other editors
+.vscode/
+*.code-workspace
+
+# Visual Studio temporary files
+*.tlog
+*.lastbuildstate
+*.pdb
+*.idb
+*.ipch
+*.sdf
+*.sqlite
+*.opensdf
+*.suo
+*.sln.docstates
+*.VC.db
+
+# Build directories
+build/
+Debug/
+Release/
+x64/
+x86/
+ARM/
+ARM64/
+
+# Logs and temporary files
+*.log
+*.tmp
+*.temp
+*.bak
+*.swp
+
+# User-specific files
+*.user
+*.rsuser
+*.suo
+*.userosscache
+*.userprefs
+*.VC.opendb
+*.VC.VC.opendb
+
+# Qt Creator
+*.pro.user
+*.qmake.stash
+*.pro.user.*
+
+# JetBrains CLion and other JetBrains IDEs
+.idea/
+*.iml
+
+# Other
+*.cache
+*.pyc
+*.pyo
+*.class
+__pycache__/
+*.class
