@@ -8,8 +8,44 @@ add_executable(${FERAL_ASCENT_GAME_TARGET_NAME}
 target_include_directories(${FERAL_ASCENT_GAME_TARGET_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 
+include(FetchContent)
+set(SFML_LIBRARY_NAME SFML)
+set(SFML_LIBRARY_INCLUDES
+    sfml-graphics
+    sfml-main
+    sfml-system
+    sfml-network
+    sfml-audio
+)
+
+FetchContent_Declare(
+	${SFML_LIBRARY_NAME}
+	GIT_REPOSITORY https://github.com/SFML/SFML
+	GIT_TAG 2.5.1
+	GIT_SHALLOW FALSE
+)
+
 target_link_libraries(
 	${FERAL_ASCENT_GAME_TARGET_NAME} PUBLIC ${SFML_LIBRARY_INCLUDES}
+)
+
+
+#FetchContent_MakeAvailable(${SFML_LIBRARY_NAME})
+FetchContent_MakeAvailable(SFML)
+
+# box2d
+set(BOX2D_LIBRARY_NAME Box2D)
+
+FetchContent_Declare(
+	${BOX2D_LIBRARY_NAME}
+	GIT_REPOSITORY https://github.com/erincatto/box2d
+	GIT_TAG v2.4.1
+	GIT_SHALLOW FALSE
+)
+
+FetchContent_MakeAvailable(${BOX2D_LIBRARY_NAME})
+target_link_libraries(
+	${FERAL_ASCENT_GAME_TARGET_NAME} PUBLIC box2d
 )
 
 function(CopyLibToTarget LIB_NAME TARGET_NAME)
@@ -28,3 +64,5 @@ CopyLibToTarget(sfml-window ${FERAL_ASCENT_GAME_TARGET_NAME})
 CopyLibToTarget(sfml-system ${FERAL_ASCENT_GAME_TARGET_NAME})
 CopyLibToTarget(sfml-audio ${FERAL_ASCENT_GAME_TARGET_NAME})
 CopyLibToTarget(sfml-network ${FERAL_ASCENT_GAME_TARGET_NAME})
+
+CopyLibToTarget(box2d ${FERAL_ASCENT_GAME_TARGET_NAME})
