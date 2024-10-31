@@ -1,6 +1,12 @@
 add_executable(${FERAL_ASCENT_GAME_TARGET_NAME}
 	${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/include/framework/Application.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/framework/Application.cpp
 )
+
+# add custom include for headers
+target_include_directories(${FERAL_ASCENT_GAME_TARGET_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+
 
 target_link_libraries(
 	${FERAL_ASCENT_GAME_TARGET_NAME} PUBLIC ${SFML_LIBRARY_INCLUDES}
