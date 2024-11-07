@@ -19,6 +19,7 @@ namespace fa
 
 		void Update(float dt);
 		void Render();
+		void LoadLevel(float tileSize);
 
 	};
 

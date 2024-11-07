@@ -1,12 +1,13 @@
 #include "framework/Application.h"
 #include "framework/player.h"
+#include "framework/LevelSystem.h"
 #include <iostream>
 
 using namespace sf;
 using namespace std;
 
-const int GAMEWIDTH = 1024;
-const int GAMEHEIGHT = 768;
+const int GAMEWIDTH = 1920;
+const int GAMEHEIGHT = 1080;
 
 Player* player;
 
@@ -33,6 +34,9 @@ namespace fa
 		player = new Player();
 		player->setPosition(Vector2f(GAMEWIDTH / 2, GAMEHEIGHT / 2));
 
+		// load level with a specific size
+		LoadLevel(GAMEWIDTH / 30);
+
 		while (m_Window.isOpen())
 		{
 			Event windowEvent;
@@ -51,17 +55,29 @@ namespace fa
 				accumlatedTime -= targetDeltaTime;
 				Update(targetDeltaTime);
 				Render();
+
 			}
 			//cout << "Updating at framerate: " << 1.f / frameDeltaTime << endl;
 
-
-
-
 		}
 
+	}
 
+	void Application::LoadLevel(float tileSize = 100.f)
+	{
 
+		LevelSystem::loadLevelFile(
+			"C:/Users/jakes/source/repos/FeralAscent/FeralAscent/assets/level_2.txt",
+			tileSize
+		);
 
+		// Print the level to the console
+		for (size_t y = 0; y < ls::getHeight(); ++y) {
+			for (size_t x = 0; x < ls::getWidth(); ++x) {
+				cout << ls::getTile({ x, y });
+			}
+			cout << endl;
+		}
 	}
 
 	void Application::Update(float dt)
@@ -74,7 +90,11 @@ namespace fa
 		m_Window.clear();
 		player->Render(m_Window);
 
+		ls::render(m_Window);
+
 		m_Window.display();
 	}
+
+
 
 }
