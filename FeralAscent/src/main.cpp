@@ -2,6 +2,8 @@
 #include <memory>
 #include <SFML/Graphics.hpp>
 #include "framework/Application.h"
+#include "framework/LevelSystem.h"
+#include "framework/player.h"
 
 using namespace	std;
 using namespace sf;
@@ -15,6 +17,8 @@ int main()
 {
 	unique_ptr<fa::Application> app = make_unique<fa::Application>();
 	app->Run();
+
+
 
 }
 

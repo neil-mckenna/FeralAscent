@@ -1,4 +1,5 @@
 #include "framework/Application.h"
+#include "framework/player.h"
 #include <iostream>
 
 using namespace sf;
@@ -6,6 +7,8 @@ using namespace std;
 
 const int GAMEWIDTH = 1024;
 const int GAMEHEIGHT = 768;
+
+Player* player;
 
 
 namespace fa
@@ -25,6 +28,10 @@ namespace fa
 		m_TickClock.restart();
 		float accumlatedTime = 0.f;
 		float targetDeltaTime = 1.f / m_TargetFrameRate;
+
+		// create a player object
+		player = new Player();
+		player->setPosition(Vector2f(GAMEWIDTH / 2, GAMEHEIGHT / 2));
 
 		while (m_Window.isOpen())
 		{
@@ -46,30 +53,26 @@ namespace fa
 				Render();
 			}
 			//cout << "Updating at framerate: " << 1.f / frameDeltaTime << endl;
+
+
+
+
 		}
+
+
+
+
 	}
 
 	void Application::Update(float dt)
 	{
-
+		player->Update(dt);
 	}
 
 	void Application::Render()
 	{
 		m_Window.clear();
-
-		RectangleShape player{ Vector2f{20,100} };
-		player.setFillColor(Color::Green);
-		player.setOrigin(10, 50);
-		player.setPosition(GAMEWIDTH / 2, GAMEHEIGHT - 75.0f);
-
-		RectangleShape ground{ Vector2f(GAMEWIDTH, 20.0f) };
-		ground.setFillColor(Color::Magenta);
-		ground.setPosition(0, GAMEHEIGHT - 25.0f);
-
-
-		m_Window.draw(ground);
-		m_Window.draw(player);
+		player->Render(m_Window);
 
 		m_Window.display();
 	}

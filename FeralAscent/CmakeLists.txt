@@ -1,7 +1,15 @@
 add_executable(${FERAL_ASCENT_GAME_TARGET_NAME}
 	${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/include/framework/Application.h
+	${CMAKE_CURRENT_SOURCE_DIR}/include/framework/entity.h
+	${CMAKE_CURRENT_SOURCE_DIR}/include/framework/player.h
+	${CMAKE_CURRENT_SOURCE_DIR}/include/framework/maths.h
+	${CMAKE_CURRENT_SOURCE_DIR}/include/framework/LevelSystem.h
+
 	${CMAKE_CURRENT_SOURCE_DIR}/src/framework/Application.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/framework/entity.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/framework/player.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/framework/LevelSystem.cpp
 )
 
 # add custom include for headers
