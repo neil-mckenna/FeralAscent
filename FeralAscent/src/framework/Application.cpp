@@ -11,7 +11,6 @@ const int GAMEHEIGHT = 768;
 namespace fa
 {
 
-
 	// Application constructor with default settings
 	Application::Application() :
 		m_Window{ VideoMode(GAMEWIDTH, GAMEHEIGHT), "FeralAscent" },
