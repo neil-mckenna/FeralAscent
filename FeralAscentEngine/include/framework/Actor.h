@@ -67,6 +67,9 @@ namespace fa
 		// destructor
 		virtual ~Actor();
 
+	protected:
+		b2Body* m_PhysicsBody;
+
 	private:
 		World* m_owningWorld;
 		bool m_hasBeganPlay;
@@ -77,7 +80,7 @@ namespace fa
 		float m_ActorRotation = 0.0f;
 		Sprite m_Sprite;
 		shared<Texture> m_Texture;
-		b2Body* m_PhysicsBody;
+
 
 		void CenterPivot();
 		void InitializePhysics();

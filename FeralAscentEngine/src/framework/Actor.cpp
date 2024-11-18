@@ -63,6 +63,8 @@ namespace fa
 	{
 		//LOG("Actor updating");
 
+		PhysicsSystem::Get().Step(dt);
+
 	}
 
 	void Actor::UpdateInternal(float dt)
@@ -201,9 +203,24 @@ namespace fa
 
 	void Actor::InitializePhysics()
 	{
+
+
 		if (!m_PhysicsBody)
 		{
 			m_PhysicsBody = PhysicsSystem::Get().AddListener(this);
+
+			if (m_PhysicsBody)
+			{
+				LOG("Physics initialized for actor: %p", m_PhysicsBody);
+			}
+			else
+			{
+				LOG("Failed to initialize physics for actor.");
+			}
+		}
+		else
+		{
+			LOG("Physics already initialized for actor: %p", m_PhysicsBody);
 		}
 	}
 

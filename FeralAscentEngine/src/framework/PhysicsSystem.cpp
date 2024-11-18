@@ -28,9 +28,9 @@ namespace fa
 		physicsSystem = move(unique<PhysicsSystem>{new PhysicsSystem});
 	}
 
-	// constructor no gravity with cm scale
+	// constructor gravity with cm scale
 	PhysicsSystem::PhysicsSystem() :
-		m_PhysicsWorld{ b2Vec2{0.f, 0.f} },
+		m_PhysicsWorld{ b2Vec2{0.f, -9.8f} },
 		m_PhysicsScale{ 0.01f },
 		m_VelocityIterations{ 8 },
 		m_PositionIterations{ 3 },
@@ -39,6 +39,7 @@ namespace fa
 	{
 		m_PhysicsWorld.SetContactListener(&m_ContactListener);
 		m_PhysicsWorld.SetAllowSleeping(false);
+
 	}
 
 	void PhysicsSystem::ProcessPendingRemovalListeners()
@@ -51,17 +52,7 @@ namespace fa
 		m_PendingRemovalListeners.clear();
 	}
 
-	void PhysicsSystem::Step(float dt)
-	{
-		ProcessPendingRemovalListeners();
 
-		m_PhysicsWorld.Step(
-			dt,
-			m_VelocityIterations,
-			m_PositionIterations
-		);
-
-	}
 
 	b2Body* PhysicsSystem::AddListener(Actor* listener)
 	{
@@ -83,6 +74,8 @@ namespace fa
 
 		b2Body* body = m_PhysicsWorld.CreateBody(&bodyDef);
 
+
+
 		b2PolygonShape shape;
 		auto bounds = listener->GetActorGlobalBounds();
 
@@ -95,12 +88,41 @@ namespace fa
 		fixtureDef.shape = &shape;
 		fixtureDef.density = 1.0f;
 		fixtureDef.friction = 0.3f;
-		fixtureDef.isSensor = true;
+		fixtureDef.isSensor = false;
 
 		body->CreateFixture(&fixtureDef);
 
+		b2Vec2 velocity = body->GetLinearVelocity();
+		LOG("Body velocity: x=%f, y=%f", velocity.x, velocity.y);
+
+
 		return body;
 	}
+
+	void PhysicsSystem::Step(float dt)
+	{
+		ProcessPendingRemovalListeners();
+
+		m_PhysicsWorld.Step(
+			dt,
+			m_VelocityIterations,
+			m_PositionIterations
+		);
+
+		for (b2Body* body = m_PhysicsWorld.GetBodyList(); body != nullptr; body = body->GetNext())
+		{
+			if (body->GetType() == b2_dynamicBody)
+			{
+				// Example: apply additional gravity force to the body (if you want more control)
+				b2Vec2 gravityForce(0.f, -9.8f * body->GetMass());
+				body->ApplyForceToCenter(gravityForce, true);
+			}
+		}
+
+		//LOG("Physics System Updating");
+
+	}
+
 
 	void PhysicsSystem::RemoveListener(b2Body* bodyToRemove)
 	{
