@@ -1,0 +1,79 @@
+# Enable verbose output for debugging
+set(CMAKE_VERBOSE_MAKEFILE ON)
+
+# Debugging: Show the current CMake version
+message(STATUS "CMake version: ${CMAKE_VERSION}")
+
+# Define the game executable
+message(STATUS "Creating executable for ${FERAL_ASCENT_GAME_TARGET_NAME}")
+add_executable(${FERAL_ASCENT_GAME_TARGET_NAME}
+    ${CMAKE_CURRENT_SOURCE_DIR}/config.h.in
+
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/gameFramework/GameApplication.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/gameFramework/GameApplication.cpp
+
+	${CMAKE_CURRENT_SOURCE_DIR}/include/player/Player.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/player/Player.cpp
+
+)
+
+# Debugging: Check if the game executable was created successfully
+message(STATUS "Executable ${FERAL_ASCENT_GAME_TARGET_NAME} created")
+
+# Add custom include directories for the target
+message(STATUS "Adding include directories for ${FERAL_ASCENT_GAME_TARGET_NAME}")
+target_include_directories(${FERAL_ASCENT_GAME_TARGET_NAME} PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+
+# Debugging: Print the include directories being added
+get_target_property(INCLUDE_DIRS ${FERAL_ASCENT_GAME_TARGET_NAME} INTERFACE_INCLUDE_DIRECTORIES)
+message(STATUS "Include directories for ${FERAL_ASCENT_GAME_TARGET_NAME}: ${INCLUDE_DIRS}")
+
+# Show the name of the linked engine target
+message(STATUS "Linking ${FERAL_ASCENT_GAME_TARGET_NAME} with ${FERAL_ASCENT_ENGINE_TARGET_NAME}")
+target_link_libraries(
+    ${FERAL_ASCENT_GAME_TARGET_NAME} PUBLIC ${FERAL_ASCENT_ENGINE_TARGET_NAME}
+)
+
+# Debugging: Check the linked libraries
+get_target_property(LINKED_LIBRARIES ${FERAL_ASCENT_GAME_TARGET_NAME} INTERFACE_LINK_LIBRARIES)
+message(STATUS "Linked libraries for ${FERAL_ASCENT_GAME_TARGET_NAME}: ${LINKED_LIBRARIES}")
+
+# Define the function to copy libraries after build
+function(CopyLibDirectoryToTarget LIB_NAME TARGET_NAME)
+    message(STATUS "Copying library directory from ${LIB_NAME} to ${TARGET_NAME} target")
+    add_custom_command(TARGET ${TARGET_NAME}
+    POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        $<TARGET_FILE_DIR:${LIB_NAME}>
+        $<TARGET_FILE_DIR:${TARGET_NAME}>
+    )
+endfunction()
+
+# Copy each SFML library after build (debugging each copy operation)
+message(STATUS "Copying SFML libraries after build")
+CopyLibDirectoryToTarget(${FERAL_ASCENT_ENGINE_TARGET_NAME} ${FERAL_ASCENT_GAME_TARGET_NAME})
+
+# setting up a asset folder for the game
+# Set asset folder name and source directory
+set(RESOURCE_FOLDER_NAME "assets")
+set(RESOURCE_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/${RESOURCE_FOLDER_NAME}")
+
+# Set up the custom command to copy the assets directory after building
+add_custom_command(
+    TARGET ${FERAL_ASCENT_GAME_TARGET_NAME}
+    POST_BUILD
+    COMMAND
+    ${CMAKE_COMMAND} -E copy_directory
+    ${RESOURCE_SRC_DIR}
+    $<TARGET_FILE_DIR:${FERAL_ASCENT_GAME_TARGET_NAME}>/${RESOURCE_FOLDER_NAME}
+)
+
+# Pass the folder names to the config.h.in for substitution
+configure_file(
+    "config.h.in"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/config.h"
+    ESCAPE_QUOTES
+
+)

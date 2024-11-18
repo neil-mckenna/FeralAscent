@@ -4,6 +4,7 @@
 #include <SFML/Graphics.hpp>
 #include <memory>
 
+
 class Entity {
 protected:
 	std::unique_ptr<sf::Shape> _shape;
@@ -21,3 +22,6 @@ public:
 	void setPosition(const sf::Vector2f& pos);
 	void move(const sf::Vector2f& pos);
 };
+
+
+

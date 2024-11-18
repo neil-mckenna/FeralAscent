@@ -10,6 +10,8 @@ set(CMAKE_CXX_STANARD_REQUIRED 	ON)
 set(CMAKE_CXX_EXTENSIONS 		OFF)
 
 # create a variable for title name.
+set(FERAL_ASCENT_ENGINE_TARGET_NAME FeralAscentEngine)
 set(FERAL_ASCENT_GAME_TARGET_NAME FeralAscentGame)
 
-add_subdirectory(FeralAscent)
+add_subdirectory(FeralAscentEngine)
+add_subdirectory(FeralAscentGame)

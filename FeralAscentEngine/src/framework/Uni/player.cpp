@@ -1,8 +1,10 @@
 //player.cpp
-#include "framework/player.h"
+#include "framework/Uni/player.h"
 
 using namespace sf;
 using namespace std;
+
+
 
 void Player::Update(double dt) {
     //Move in four directions based on keys
@@ -10,7 +12,7 @@ void Player::Update(double dt) {
     if (Keyboard::isKeyPressed(Keyboard::A))
     {
         // move left
-         move(Vector2f(-5.0f * _speed * dt, 0.0f));
+        move(Vector2f(-5.0f * _speed * dt, 0.0f));
     }
     else if (Keyboard::isKeyPressed(Keyboard::D))
     {
@@ -20,7 +22,7 @@ void Player::Update(double dt) {
     else if (Keyboard::isKeyPressed(Keyboard::W))
     {
         // move up
-        move(Vector2f(0.0f ,-5.0f * _speed * dt));
+        move(Vector2f(0.0f, -5.0f * _speed * dt));
     }
     else if (Keyboard::isKeyPressed(Keyboard::S))
     {
@@ -40,3 +42,6 @@ Player::Player()
 void Player::Render(sf::RenderWindow& window) const {
     window.draw(*_shape);
 }
+
+
+

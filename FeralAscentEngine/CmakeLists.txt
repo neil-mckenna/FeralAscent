@@ -1,0 +1,104 @@
+add_library(${FERAL_ASCENT_ENGINE_TARGET_NAME} STATIC
+
+	${CMAKE_CURRENT_SOURCE_DIR}/include/EntryPoint.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/EntryPoint.cpp
+
+	${CMAKE_CURRENT_SOURCE_DIR}/include/framework/Actor.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/framework/Actor.cpp
+
+	${CMAKE_CURRENT_SOURCE_DIR}/include/framework/Application.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/framework/Application.cpp
+
+	${CMAKE_CURRENT_SOURCE_DIR}/include/framework/AssetManager.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/framework/AssetManager.cpp
+
+	${CMAKE_CURRENT_SOURCE_DIR}/include/framework/Core.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/framework/Core.cpp
+
+	${CMAKE_CURRENT_SOURCE_DIR}/include/framework/MathUtility.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/framework/MathUtility.cpp
+
+	${CMAKE_CURRENT_SOURCE_DIR}/include/framework/Object.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/framework/Object.cpp
+
+
+	${CMAKE_CURRENT_SOURCE_DIR}/include/framework/PhysicsSystem.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/framework/PhysicsSystem.cpp
+
+	${CMAKE_CURRENT_SOURCE_DIR}/include/framework/World.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/framework/World.cpp
+
+	${CMAKE_CURRENT_SOURCE_DIR}/include/framework/Uni/player.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/framework/Uni/player.cpp
+
+	${CMAKE_CURRENT_SOURCE_DIR}/include/framework/Uni/LevelSystem.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/framework/Uni/LevelSystem.cpp
+
+	${CMAKE_CURRENT_SOURCE_DIR}/include/framework/Uni/entity.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/framework/Uni/entity.cpp
+
+	${CMAKE_CURRENT_SOURCE_DIR}/include/framework/Uni/maths.h
+ )
+
+# add custom include for headers
+target_include_directories(${FERAL_ASCENT_ENGINE_TARGET_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+
+include(FetchContent)
+set(SFML_LIBRARY_NAME SFML)
+set(SFML_LIBRARY_INCLUDES
+    sfml-graphics
+    sfml-main
+    sfml-system
+    sfml-network
+    sfml-audio
+)
+
+FetchContent_Declare(
+	${SFML_LIBRARY_NAME}
+	GIT_REPOSITORY https://github.com/SFML/SFML
+	GIT_TAG 2.5.1
+	GIT_SHALLOW FALSE
+)
+
+target_link_libraries(
+	${FERAL_ASCENT_ENGINE_TARGET_NAME} PUBLIC ${SFML_LIBRARY_INCLUDES}
+)
+
+
+#FetchContent_MakeAvailable(${SFML_LIBRARY_NAME})
+FetchContent_MakeAvailable(SFML)
+
+# box2d
+set(BOX2D_LIBRARY_NAME Box2D)
+
+FetchContent_Declare(
+	${BOX2D_LIBRARY_NAME}
+	GIT_REPOSITORY https://github.com/erincatto/box2d
+	GIT_TAG v2.4.1
+	GIT_SHALLOW FALSE
+)
+
+FetchContent_MakeAvailable(${BOX2D_LIBRARY_NAME})
+target_link_libraries(
+	${FERAL_ASCENT_ENGINE_TARGET_NAME} PUBLIC box2d
+)
+
+function(CopyLibToTarget LIB_NAME TARGET_NAME)
+	add_custom_command(TARGET ${TARGET_NAME}
+	POST_BUILD
+	COMMAND ${CMAKE_COMMAND} -E copy_if_different
+		$<TARGET_FILE:${LIB_NAME}>
+		$<TARGET_FILE_DIR:${TARGET_NAME}>
+	)
+endfunction()
+
+
+# Copy each SFML library after build
+CopyLibToTarget(sfml-graphics ${FERAL_ASCENT_ENGINE_TARGET_NAME})
+CopyLibToTarget(sfml-window ${FERAL_ASCENT_ENGINE_TARGET_NAME})
+CopyLibToTarget(sfml-system ${FERAL_ASCENT_ENGINE_TARGET_NAME})
+CopyLibToTarget(sfml-audio ${FERAL_ASCENT_ENGINE_TARGET_NAME})
+CopyLibToTarget(sfml-network ${FERAL_ASCENT_ENGINE_TARGET_NAME})
+
+CopyLibToTarget(box2d ${FERAL_ASCENT_ENGINE_TARGET_NAME})

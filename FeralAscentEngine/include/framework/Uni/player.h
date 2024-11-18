@@ -1,6 +1,7 @@
 //player.h
 #pragma once
-#include "entity.h"
+#include "framework/Uni/entity.h"
+
 
 class Player : public Entity {
 private:
@@ -11,3 +12,6 @@ public:
 	Player();
 	void Render(sf::RenderWindow& window) const override;
 };
+
+
+
