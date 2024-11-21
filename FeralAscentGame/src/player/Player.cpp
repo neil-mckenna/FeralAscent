@@ -50,19 +50,13 @@ namespace fa
 		{
 			m_MoveInput.x -= m_speed * dt; // Move left
 			// Edit sprite to face left
-			if (!m_facingLeft) {
-				m_facingLeft = true;
-				RescaleActor(-1.f, 1.f);
-			}
+			FaceLeft();
 		}
 		if (Keyboard::isKeyPressed(Keyboard::D))
 		{
 			m_MoveInput.x += m_speed * dt; // Move right
 			// Edit sprite to face right
-			if (m_facingLeft) {
-				m_facingLeft = false;
-				RescaleActor(1.f, 1.f);
-			}
+			FaceRight();
 		}
 
 		// Up/down sprites?

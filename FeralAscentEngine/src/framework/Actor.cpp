@@ -15,7 +15,6 @@ namespace fa
 		m_Texture{},
 		m_PhysicsBody{nullptr},
 		m_PhysicsEnabled{false}
-
 	{
 		SetTexture(texturePath);
 
@@ -126,6 +125,18 @@ namespace fa
 	void Actor::RescaleActor(float scaleXAmt, float scaleYAmt)
 	{
 		m_Sprite.setScale(scaleXAmt, scaleYAmt);
+	}
+
+	void Actor::FaceLeft()
+	{
+		m_Sprite.setScale(-1.f, 1.f);
+		m_facingLeft = true;
+	}
+
+	void Actor::FaceRight()
+	{
+		m_Sprite.setScale(1.f, 1.f);
+		m_facingLeft = false;
 	}
 
 	Vector2u Actor::GetWindowSize() const
