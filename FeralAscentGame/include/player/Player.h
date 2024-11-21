@@ -24,6 +24,7 @@ namespace fa
 		void BeginPlay();
 		Vector2f m_MoveInput;
 		float m_speed;
+		bool m_facingLeft = true;
 
 	};
 
