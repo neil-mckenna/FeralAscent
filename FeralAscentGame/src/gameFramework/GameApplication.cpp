@@ -15,6 +15,9 @@ fa::Application* GetApplication()
 
 namespace fa
 {
+	weak<World> newWorld;
+	weak<Player> player_1;
+	vector<weak<Enemy>> enemies;
 
 
 	GameApplication::GameApplication()
@@ -23,12 +26,12 @@ namespace fa
 		AssetManager::Get().SetAssetRootDirectory(GetResourceDir());
 
 		LOG("GAME Application called");
-		weak<World> newWorld = LoadWorld<World>();
+		newWorld = LoadWorld<World>();
 
 		if (auto world = newWorld.lock())
 		{
 			// spawn a player into the world with a specific sprite
-			weak<Player> player_1 = newWorld.lock()->SpawnActor<Player>(
+			player_1 = newWorld.lock()->SpawnActor<Player>(
 				//"PNG/player/playerShip1_blue.png"
 				"PNG/Player/walking_sprites/right_walk_1.png"
 			);
@@ -44,6 +47,7 @@ namespace fa
 			enemy_1.lock()->SetEnablePhysics(true);
 			enemy_1.lock()->SetActorLocation(sf::Vector2f(780.f, 490.f));
 
+			enemies.push_back(enemy_1);
 		}
 		else
 		{

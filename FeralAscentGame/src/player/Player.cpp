@@ -11,7 +11,7 @@ namespace fa
 {
 	Player::Player(World* owningWorld, const string& texturePath) :
 		Actor{owningWorld, texturePath},
-		m_speed{100.0f},
+		m_speed{200.0f},
 		m_MoveInput{0.0f, 0.0f}
 	{
 		//LOG("Texture Path : %s", texturePath.c_str());
@@ -25,7 +25,7 @@ namespace fa
 		HandleInput(dt); // Process input to update movement
 		ClampInputOnEdge();
 		NormalizeInput(); // Optional: Normalize movement direction
-		AddActorLocationOffset(m_MoveInput * m_speed * dt * 5.0f); // Apply movement
+		AddActorLocationOffset(m_MoveInput * m_speed * dt); // Apply movement
 
 		if (m_PhysicsBody)
 		{
@@ -48,19 +48,18 @@ namespace fa
 		// Accumulate movement based on key presses
 		if (Keyboard::isKeyPressed(Keyboard::A))
 		{
-			m_MoveInput.x -= m_speed * dt; // Move left
 			// Edit sprite to face left
 			FaceLeft();
+			m_MoveInput.x -= m_speed * dt; // Move left
 		}
 		if (Keyboard::isKeyPressed(Keyboard::D))
 		{
-			m_MoveInput.x += m_speed * dt; // Move right
 			// Edit sprite to face right
 			FaceRight();
+			m_MoveInput.x += m_speed * dt; // Move right
 		}
 
-		// Up/down sprites?
-		if (Keyboard::isKeyPressed(Keyboard::W) || Keyboard::isKeyPressed(Keyboard::Space))
+		if (Keyboard::isKeyPressed(Keyboard::W))
 		{
 			m_MoveInput.y -= m_speed * dt; // Move up
 		}
@@ -95,29 +94,19 @@ namespace fa
 		);
 
 		Vector2f actorLocation = GetActorLocation();
-		float actorWidth = GetActorGlobalBounds().width / 4;
-		float actorHeight = GetActorGlobalBounds().height / 4;
+		float actorWidth = GetActorGlobalBounds().width / 2;
+		float actorHeight = GetActorGlobalBounds().height / 2;
 
 		// left side
-		if (actorLocation.x < 0 + (actorWidth) && m_MoveInput.x <= -1)
-		{
-			m_MoveInput.x = 0.f;
-		}
-
-		// right side
-		if (actorLocation.x > GetWindowSize().x - (actorWidth) && m_MoveInput.x >= 1.f)
+		if (actorLocation.x < 0 + (actorWidth) && m_MoveInput.x < 0.f
+			|| actorLocation.x > GetWindowSize().x - (actorWidth) && m_MoveInput.x > 0.f)
 		{
 			m_MoveInput.x = 0.f;
 		}
 
 		// top
-		if (actorLocation.y < 0 + (actorHeight) && m_MoveInput.y <= -1)
-		{
-			m_MoveInput.y = 0.f;
-		}
-
-		// bottom
-		if (actorLocation.y > GetWindowSize().y - (actorHeight) && m_MoveInput.y >= 1.f)
+		if (actorLocation.y < 0 + (actorHeight) && m_MoveInput.y < 0.f
+			|| actorLocation.y > GetWindowSize().y - (actorHeight) && m_MoveInput.y > 0.f)
 		{
 			m_MoveInput.y = 0.f;
 		}
