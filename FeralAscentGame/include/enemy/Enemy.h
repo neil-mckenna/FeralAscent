@@ -15,6 +15,7 @@ namespace fa
 
 		float GetSpeed() const { return m_speed; }
 		void SetSpeed(float newSpeed) { m_speed = newSpeed; }
+		void MoveRandom(float dt);
 
 	private:
 		void HandleInput(float dt);
@@ -25,6 +26,7 @@ namespace fa
 		void BeginPlay();
 		Vector2f m_MoveInput;
 		float m_speed;
+		Vector2f randomDirection;
 	};
 
 }
