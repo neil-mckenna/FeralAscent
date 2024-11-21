@@ -11,9 +11,8 @@ namespace fa
 {
 	Player::Player(World* owningWorld, const string& texturePath) :
 		Actor{owningWorld, texturePath},
-		m_speed{125.0f},
+		m_speed{100.0f},
 		m_MoveInput{0.0f, 0.0f}
-
 	{
 		//LOG("Texture Path : %s", texturePath.c_str());
 
@@ -50,11 +49,23 @@ namespace fa
 		if (Keyboard::isKeyPressed(Keyboard::A))
 		{
 			m_MoveInput.x -= m_speed * dt; // Move left
+			// Edit sprite to face left
+			if (!m_facingLeft) {
+				m_facingLeft = true;
+				RescaleActor(-1.f, 1.f);
+			}
 		}
 		if (Keyboard::isKeyPressed(Keyboard::D))
 		{
 			m_MoveInput.x += m_speed * dt; // Move right
+			// Edit sprite to face right
+			if (m_facingLeft) {
+				m_facingLeft = false;
+				RescaleActor(1.f, 1.f);
+			}
 		}
+
+		// Up/down sprites?
 		if (Keyboard::isKeyPressed(Keyboard::W) || Keyboard::isKeyPressed(Keyboard::Space))
 		{
 			m_MoveInput.y -= m_speed * dt; // Move up
