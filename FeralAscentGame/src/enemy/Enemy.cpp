@@ -1,5 +1,5 @@
 #include "enemy/Enemy.h"
-#include "framework/PhysicsSystem.h"
+
 
 namespace fa
 {
@@ -49,6 +49,6 @@ namespace fa
 	{
 		Actor::BeginPlay();
 
-		SetEnablePhysics(true);
+
 	}
 }

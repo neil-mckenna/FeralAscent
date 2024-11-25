@@ -25,6 +25,7 @@ namespace fa
 		void BeginPlayInternal();
 
 		virtual void Update(float dt);
+		void LogActorDetails();
 		void UpdateInternal(float dt);
 
 		void SetTexture(const string texturePath);
@@ -57,35 +58,29 @@ namespace fa
 
 		bool IsActorOutOfWindowBounds() const;
 
-		bool SetEnablePhysics(bool enable);
-
-		virtual void OnActorBeginOverlap(Actor* other);
-		virtual void OnActorEndOverlap(Actor* other);
-
 		virtual void Destroy() override;
 
 		// destructor
 		virtual ~Actor();
 
 	protected:
-		b2Body* m_PhysicsBody;
 
 	private:
 		World* m_owningWorld;
 		bool m_hasBeganPlay;
-
-		bool m_PhysicsEnabled;
 
 
 		float m_ActorRotation = 0.0f;
 		Sprite m_Sprite;
 		shared<Texture> m_Texture;
 
-
 		void CenterPivot();
-		void InitializePhysics();
-		void UninitializePhysics();
-		void UpdatePhysicsBodyTransform();
+
+		bool m_dynamic;
+		Vector2i m_position;
+		b2Body* m_body;
+
+
 	};
 
 

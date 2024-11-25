@@ -2,6 +2,8 @@
 #include "EntryPoint.h"
 #include "framework/Application.h"
 
+
+
 int main()
 {
     fa::Application* app = GetApplication();

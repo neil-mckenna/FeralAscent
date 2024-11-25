@@ -1,60 +1,49 @@
 #pragma once
 
+#include <vector>
+#include <memory>
 #include "framework/Actor.h"
+#include "framework/Application.h"
 #include "framework/Core.h"
+#include <Box2D/Box2D.h>
 #include <SFML/Graphics.hpp>
 
-namespace fa
-{
-	class Application;
-	class Actor;
+namespace fa {
 
-	class World
-	{
-	public:
-		World(Application* owningApp);
+    class World {
+    public:
+        // Constructor and Destructor
+        World(Application* owningApp, const b2Vec2& gravity);
+        ~World();
 
-		void BeginPlayInternal();
-		void UpdateInternal(float dt);
-		void Render(RenderWindow& window);
+        // Update and Render methods
+        void UpdateInternal(float dt);  // Internal updates, e.g., actor updates
+        void Render(sf::RenderWindow& window);  // Render all actors
 
-		// destructor
-		virtual ~World();
+        // BeginPlay methods
+        void BeginPlay();  // Called when the world starts
+        void BeginPlayInternal();  // Internal method to handle logic on start
 
-		template<typename ActorType, typename... Args>
-		shared<ActorType> SpawnActor(Args... args);
+        // Custom update and clean cycle
+        void Update(float dt);  // Custom updates
+        void CleanCycle();  // Handle any pending destruction of actors
 
-		Vector2u GetWindowSize() const;
+        // Getter for Box2D world
+        b2World& GetB2World();
 
-		void CleanCycle();
+        // Window size for boundaries and calculations
+        sf::Vector2u GetWindowSize() const;
 
-	private:
-		Application* m_owningApp;
-		bool m_BeginPlay;
-
-		void BeginPlay();
-		void Update(float dt);
-
-		List<shared<Actor>> m_Actors;
-		List<shared<Actor>> m_pendingActors;
-
-	};
-
-	template<typename ActorType, typename... Args>
-	shared<ActorType> World::SpawnActor(Args... args)
-	{
-		// Create a new shared pointer of ActorType and initialize it with this world as the owner
-		shared<ActorType> newActor = std::make_shared<ActorType>(this, args...);
-
-		// Add the new actor to the pending actors list
-		m_pendingActors.push_back(newActor);
-
-		//LOG("Actor Spawned");
-
-		// Return the shared pointer, allowing the caller to manage its lifetime directly
-		return newActor;
-	}
+        // Set gravity for the world
+        void SetGravity(const b2Vec2& gravity);
 
 
+    private:
 
+        Application* m_owningApp;  // Pointer to the owning application
+        bool m_BeginPlay;  // Flag to track if the world has started
+        std::vector<std::shared_ptr<Actor>> m_Actors;  // List of actors in the world
+        std::vector<std::shared_ptr<Actor>> m_pendingActors;  // List of pending actors to add
+        b2World b2WorldInstance;  // Box2D world instance for physics simulations
+    };
 }

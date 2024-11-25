@@ -2,72 +2,69 @@
 #include <SFML/Graphics.hpp>
 #include <Box2d/box2d.h>
 #include "framework/Core.h"
-
-using namespace sf;
-using namespace std;
+#include <memory>
 
 namespace fa
 {
+    class World;
 
-	class World;
-	class Application
-	{
-	public:
-		Application(
-			unsigned int windowWidth,
-			unsigned int windowHeight,
-			const std::string& title,
-			sf::Uint32 style);
+    class Application
+    {
+    public:
+        // Default constructor initializing members with default values
+        Application();
 
-		void Run();
+        // Parameterized constructor that initializes the window with given parameters
+        Application(unsigned int windowWidth, unsigned int windowHeight,
+            const std::string& title, sf::Uint32 style);
 
-		template<typename WorldType>
-		weak<WorldType> LoadWorld();
+        // Function to run the application
+        virtual void Run();
 
-		Vector2u GetWindowSize() const
-		{
-			return m_Window.getSize();
-		}
+        // Template function to load different types of worlds
+        template<typename WorldType>
+        std::weak_ptr<WorldType> LoadWorld();
 
-	protected:
-		virtual void Update(float dt);
+        // Get the window size
+        sf::Vector2u GetWindowSize() const;
 
+        virtual ~Application();
 
-	private:
-		RenderWindow m_Window;
-		float m_TargetFrameRate;
-		Clock m_TickClock;
-		shared<World> m_currentWorld;
+    protected:
+        virtual void Update(float dt);
+        sf::RenderWindow m_Window;
 
-		Clock m_CleanCycleClock;
-		float m_CleanCycleInterval;
+    private:
+        float m_TargetFrameRate;  // Target frame rate
+        sf::Clock m_TickClock;    // Clock for updating the game
+        std::shared_ptr<World> m_currentWorld;  // Current world loaded
 
-		void UpdateInternal(float dt);
+        sf::Clock m_CleanCycleClock;  // Clock for cleaning up resources periodically
+        float m_CleanCycleInterval;   // Interval for cleanup
 
-		void RenderInternal();
-		virtual void Render();
+        void UpdateInternal(float dt);  // Internal update method
+        void RenderInternal();          // Internal render method
+        virtual void Render();          // Custom render method for derived classes
+    };
 
+    // Template function definition
+    template<typename WorldType>
+    std::weak_ptr<WorldType> Application::LoadWorld()
+    {
+        // Logging world load attempt
+        LOG("Attempting to load world of type WorldType");
 
+        // Create new world instance of type WorldType
+        std::shared_ptr<WorldType> newWorld{ new WorldType{this} };
+        LOG("WorldType instance created");
 
-	};
+        // Set the current world
+        m_currentWorld = newWorld;
+        LOG("m_currentWorld set");
 
-	template<typename WorldType>
-	std::weak_ptr<WorldType> Application::LoadWorld()
-	{
-		LOG("Attempting to load world of type WorldType");
+        // Call BeginPlay after world creation
+        m_currentWorld->BeginPlayInternal();
 
-		shared<WorldType> newWorld{ new WorldType{this} };
-		LOG("WorldType instance created");
-
-		m_currentWorld = newWorld;
-		LOG("m_currentWorld set");
-
-		// call play after creation
-		m_currentWorld->BeginPlayInternal();
-
-		return newWorld;
-	}
-
-
-
+        return newWorld;
+    }
 }

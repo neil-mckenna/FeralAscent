@@ -1,101 +1,75 @@
+// World.cpp
 #include "framework/World.h"
-#include "framework/Core.h"
 #include "framework/Actor.h"
 #include "framework/Application.h"
+#include <SFML/Graphics.hpp>
 
-namespace fa
-{
-	World::World(Application* owningApp)
-		: m_owningApp{ owningApp },
-		m_BeginPlay{false},
-		m_Actors{},
-		m_pendingActors{}
-	{
-		LOG("World created");
+namespace fa {
 
-	}
+    // Constructor now takes a gravity vector
+    World::World(Application* owningApp, const b2Vec2& gravity)
+        : m_owningApp(owningApp),
+        m_BeginPlay(false),
+        b2WorldInstance(gravity)  // Initialize Box2D with the given gravity
+    {
+    }
 
-	void World::BeginPlayInternal()
-	{
+    World::~World() {
+        CleanCycle();
+    }
 
-		if (!m_BeginPlay)
-		{
-			m_BeginPlay = true;
-			BeginPlay();
-		}
+    void World::UpdateInternal(float dt) {
+        // Update all actors and Box2D world
+        for (auto& actor : m_Actors) {
+            actor->Update(dt);
+        }
 
-	}
+        b2WorldInstance.Step(dt, 8, 3);  // Default velocity and position iterations
 
-	void World::UpdateInternal(float dt)
-	{
-		//LOG("Pending Actors size()  %d", m_pendingActors.size());
-		for (shared<Actor> actor : m_pendingActors)
-		{
-			//LOG("Pending Actor added to Actors");
-			m_Actors.push_back(actor);
+        CleanCycle();
+    }
 
-			actor->BeginPlayInternal();
-		}
+    void World::Render(sf::RenderWindow& window) {
+        for (auto& actor : m_Actors) {
+            actor->Render(window);
+        }
+    }
 
-		m_pendingActors.clear();
+    void World::BeginPlay() {
+        // World initialization logic
+    }
 
+    void World::BeginPlayInternal() {
+        if (!m_BeginPlay) {
+            m_BeginPlay = true;
+            BeginPlay();
+        }
+    }
 
-		for (auto iter = m_Actors.begin(); iter != m_Actors.end();)
-		{
-			iter->get()->UpdateInternal(dt);
-			++iter;
+    void World::Update(float dt) {
+        UpdateInternal(dt);  // Call internal update method
+    }
 
-		}
+    void World::CleanCycle() {
+        for (auto& actor : m_pendingActors) {
+            auto it = std::find(m_Actors.begin(), m_Actors.end(), actor);
+            if (it != m_Actors.end()) {
+                m_Actors.erase(it);
+            }
+        }
+        m_pendingActors.clear();
+    }
 
-		Update(dt);
-	}
+    b2World& World::GetB2World() {
+        return b2WorldInstance;
+    }
 
-	void World::Render(RenderWindow& window)
-	{
-		for (auto& actor : m_Actors)
-		{
-			actor->Render(window);
-		}
+    sf::Vector2u World::GetWindowSize() const {
+        return m_owningApp->GetWindowSize();
+    }
 
+    void World::SetGravity(const b2Vec2& gravity) {
+        b2WorldInstance.SetGravity(gravity);
+    }
 
-	}
-
-
-	void World::BeginPlay()
-	{
-		LOG("Begin Play");
-	}
-
-	void World::Update(float dt)
-	{
-		//LOG("Updating at framerate %f", 1.f / dt);
-		//LOG("Actors count %zu" , m_Actors.size());
-	}
-
-	Vector2u World::GetWindowSize() const
-	{
-		return m_owningApp->GetWindowSize();
-	}
-
-	void World::CleanCycle()
-	{
-		for (auto iter = m_Actors.begin(); iter != m_Actors.end();)
-		{
-			if (iter->get()->IsPendingDestroy())
-			{
-				iter = m_Actors.erase(iter);
-			}
-			else
-			{
-				++iter;
-			}
-		}
-
-
-	}
-
-	World::~World()
-	{
-
-	}
 }

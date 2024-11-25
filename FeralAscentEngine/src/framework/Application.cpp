@@ -1,121 +1,81 @@
-#include <iostream>
 #include "framework/Application.h"
-#include "framework/Core.h"
-#include "framework/World.h"
-#include "framework/AssetManager.h"
-#include "framework/PhysicsSystem.h"
+#include <SFML/Graphics.hpp>
+#include <Box2d/box2d.h>
+#include <iostream>
 
+namespace fa {
 
-using namespace sf;
-using namespace std;
+    // Default constructor initializing members with default values
+    Application::Application()
+        : m_Window(sf::VideoMode(800, 600), "Default Title", sf::Style::Default),  // Default window size and title
+        m_TargetFrameRate(60.0f),  // Default target frame rate
+        m_CleanCycleInterval(1.0f),  // Default clean cycle interval
+        m_currentWorld(nullptr)  // Initially no world loaded
+    {
+        std::cout << "Application created with default constructor." << std::endl;
+    }
 
-const int GAMEWIDTH = 768;
-const int GAMEHEIGHT = 1024;
+    // Parameterized constructor that initializes the window with given parameters
+    Application::Application(unsigned int windowWidth, unsigned int windowHeight,
+        const std::string& title, sf::Uint32 style)
+        : m_Window(sf::VideoMode(windowWidth, windowHeight), title, style),
+        m_TargetFrameRate(60.0f),  // Default target frame rate
+        m_CleanCycleInterval(1.0f),  // Default clean cycle interval
+        m_currentWorld(nullptr)  // Initially no world loaded
+    {
+        std::cout << "Application created with custom window size and title." << std::endl;
+    }
 
-namespace fa
-{
+    // Method to run the application
+    void Application::Run()
+    {
+        sf::Clock clock;
 
-	Application::Application(unsigned int windowWidth, unsigned int windowHeight,
-		const std::string& title, sf::Uint32 style
+        // Game loop
+        while (m_Window.isOpen()) {
+            sf::Time deltaTime = clock.restart();
+            Update(deltaTime.asSeconds());
+            Render();
+        }
+    }
 
-	) :
-		m_Window{ sf::VideoMode(windowWidth, windowHeight),  title, style },
-		m_TargetFrameRate{ 60.f },
-		m_TickClock{},
-		m_currentWorld{ nullptr },
-		m_CleanCycleClock{},
-		m_CleanCycleInterval{ 2.f }
-	{
+    sf::Vector2u Application::GetWindowSize() const
+    {
+        return m_Window.getSize();
+    }
 
-	}
+    // Update function, typically used to update the game's state
+    void Application::Update(float dt)
+    {
+        // Update internal game logic and world
+        UpdateInternal(dt);
+    }
 
-	void Application::Run()
-	{
-		m_TickClock.restart();
-		float accumlatedTime = 0.f;
-		float targetDeltaTime = 1.f / m_TargetFrameRate;
+    // Internal update method (this method can be called from other game logic)
+    void Application::UpdateInternal(float dt)
+    {
+        // Logic for updating the application per frame (e.g., physics updates)
+        std::cout << "Updating with deltaTime: " << dt << std::endl;
+    }
 
-		while (m_Window.isOpen())
-		{
-			Event windowEvent;
-			while (m_Window.pollEvent(windowEvent))
-			{
-				// close the window
-				if (windowEvent.type == Event::EventType::Closed)
-				{
-					m_Window.close();
-				}
-			}
-			float frameDeltaTime = m_TickClock.restart().asSeconds();
-			accumlatedTime += frameDeltaTime;
-			while (accumlatedTime > targetDeltaTime)
-			{
-				accumlatedTime -= targetDeltaTime;
-				UpdateInternal(targetDeltaTime);
-				RenderInternal();
-			}
+    // Render method, draws everything to the window
+    void Application::Render()
+    {
+        RenderInternal();  // Calls internal render method, which can be overridden
+    }
 
-			//LOG("Updating frame rate at %f", 1.f /frameDeltaTime);
+    // Internal render method
+    void Application::RenderInternal()
+    {
+        m_Window.clear();  // Clear the window
+        // You would usually call render for different game objects or world here
+        m_Window.display();  // Display the window contents
+    }
 
+    // Destructor
+    Application::~Application()
+    {
+        std::cout << "Application destroyed." << std::endl;
+    }
 
-
-		}
-	}
-
-	void Application::RenderInternal()
-	{
-		m_Window.clear();
-
-		Render();
-
-		m_Window.display();
-	}
-
-	void Application::UpdateInternal(float dt)
-	{
-
-		Update(dt);
-
-		if (m_currentWorld)
-		{
-			m_currentWorld->BeginPlayInternal();
-			m_currentWorld->UpdateInternal(dt);
-		}
-		else
-		{
-			LOG("No current world");
-		}
-
-		// physics update
-		PhysicsSystem::Get().Step(dt);
-
-
-
-		if (m_CleanCycleClock.getElapsedTime().asSeconds() >= m_CleanCycleInterval)
-		{
-			// garbage collection
-			m_CleanCycleClock.restart();
-			AssetManager::Get().CleanCycle();
-			if (m_currentWorld)
-			{
-				m_currentWorld->CleanCycle();
-			}
-
-		}
-
-	}
-
-	void Application::Render()
-	{
-		if (m_currentWorld)
-		{
-			m_currentWorld->Render(m_Window);
-		}
-
-	}
-
-	void Application::Update(float dt)
-	{
-
-	}
-}
+} // namespace fa

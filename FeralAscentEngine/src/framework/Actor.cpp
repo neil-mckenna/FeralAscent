@@ -3,8 +3,12 @@
 #include "framework/AssetManager.h"
 #include "framework/MathUtility.h"
 #include "framework/World.h"
-#include "framework/PhysicsSystem.h"
+#include <sstream>
+#include <string>
+
 #include <box2d/b2_body.h>
+
+using namespace std;
 
 namespace fa
 {
@@ -13,11 +17,32 @@ namespace fa
 		m_hasBeganPlay(false),
 		m_Sprite{},
 		m_Texture{},
-		m_PhysicsBody{nullptr},
-		m_PhysicsEnabled{false}
+		m_body{nullptr},
+		m_dynamic{true},
+		m_position{0,0}
 
 	{
 		SetTexture(texturePath);
+
+		// Define the Box2D body
+		b2BodyDef bodyDef;
+		bodyDef.type = m_dynamic ? b2_dynamicBody : b2_staticBody;
+		bodyDef.position.Set(m_position.x, m_position.y);
+
+		// Create the body in the Box2D world
+		m_body = m_owningWorld->GetB2World().CreateBody(&bodyDef);
+
+		// Define a shape for the body (rectangle for simplicity)
+		b2PolygonShape dynamicBox;
+		dynamicBox.SetAsBox(m_Sprite.getGlobalBounds().width / 2.0f, m_Sprite.getGlobalBounds().height / 2.0f);
+
+		// Create the fixture (add the shape to the body)
+		b2FixtureDef fixtureDef;
+		fixtureDef.shape = &dynamicBox;
+		fixtureDef.density = 1.0f;
+		fixtureDef.friction = 0.3f;
+		m_body->CreateFixture(&fixtureDef);
+
 
 	}
 
@@ -63,9 +88,31 @@ namespace fa
 	{
 		//LOG("Actor updating");
 
-		PhysicsSystem::Get().Step(dt);
+		LogActorDetails();
 
 	}
+
+	void Actor::LogActorDetails()
+	{
+		stringstream logMessage;
+
+		// Append each variable to the log message
+		//logMessage << "Actor Name: " << m_ActorName << "\n";
+		//logMessage << "Body: " << m_body << "\n";  // Log the body pointer or position depending on your needs
+
+		logMessage << "Dynamic: " << (m_dynamic ? "true" : "false") << "\n";
+		//logMessage << "Position: (" << m_position.x << ", " << m_position.y << ")\n";
+
+		// If m_owningWorld is a pointer, log its validity or more details
+		//logMessage << "Owning World: " << (m_owningWorld ? "Valid" : "Null") << "\n";  // Adjust this line as needed
+
+		// Check if the texture is loaded
+		//logMessage << "Texture: " << (m_Texture && m_Texture->getSize().x > 0 ? "Loaded" : "Not Loaded") << "\n";
+
+		// Pass the log message to the LOG function
+		LOG("", logMessage.str());
+	}
+
 
 	void Actor::UpdateInternal(float dt)
 	{
@@ -77,19 +124,26 @@ namespace fa
 
 	void Actor::Render(RenderWindow& window)
 	{
+		if (m_dynamic) {
+			m_Sprite.setColor(sf::Color::Green); // Green for dynamic
+		}
+		else {
+			m_Sprite.setColor(sf::Color::Red); // Red for static
+		}
+
 		window.draw(m_Sprite);
 	}
 
 	void Actor::SetActorLocation(const Vector2f& newLocation)
 	{
 		m_Sprite.setPosition(newLocation);
-		UpdatePhysicsBodyTransform();
+
 	}
 
 	void Actor::SetActorRotation(const float newRot)
 	{
 		m_ActorRotation = newRot;
-		UpdatePhysicsBodyTransform();
+
 	}
 
 	Vector2f Actor::GetActorLocation() const
@@ -184,86 +238,10 @@ namespace fa
 		return false;
 	}
 
-	bool Actor::SetEnablePhysics(bool enable)
-	{
-		m_PhysicsEnabled = enable;
-		if (m_PhysicsEnabled)
-		{
-			InitializePhysics();
-		}
-		else
-		{
-			UninitializePhysics();
-		}
-
-		return false;
-	}
-
-
-
-	void Actor::InitializePhysics()
-	{
-
-
-		if (!m_PhysicsBody)
-		{
-			m_PhysicsBody = PhysicsSystem::Get().AddListener(this);
-
-			if (m_PhysicsBody)
-			{
-				LOG("Physics initialized for actor: %p", m_PhysicsBody);
-			}
-			else
-			{
-				LOG("Failed to initialize physics for actor.");
-			}
-		}
-		else
-		{
-			LOG("Physics already initialized for actor: %p", m_PhysicsBody);
-		}
-	}
-
-	void Actor::UninitializePhysics()
-	{
-		if (m_PhysicsBody)
-		{
-			PhysicsSystem::Get().RemoveListener(m_PhysicsBody);
-			m_PhysicsBody = nullptr;
-		}
-	}
-
-	void Actor::UpdatePhysicsBodyTransform()
-	{
-		if (m_PhysicsBody)
-		{
-			float physicsScale = PhysicsSystem::Get().GetPhysicsScale();
-			b2Vec2 pos{
-				GetActorLocation().x * physicsScale,
-				GetActorLocation().y * physicsScale
-			};
-
-			float rotation = DegreesToRadians(GetActorRotation());
-
-			m_PhysicsBody->SetTransform(pos, rotation);
-
-		}
-	}
-
-	void Actor::OnActorBeginOverlap(Actor* other)
-	{
-		LOG("Overlapped");
-	}
-
-	void Actor::OnActorEndOverlap(Actor* other)
-	{
-		LOG("Overlap Ended");
-
-	}
 
 	void Actor::Destroy()
 	{
-		UninitializePhysics();
+
 		Object::Destroy();
 	}
 

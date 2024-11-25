@@ -1,5 +1,5 @@
 #include "player/Player.h"
-#include "framework/PhysicsSystem.h"
+
 #include <SFML/Graphics.hpp>
 #include "framework/Core.h"
 #include <cmath>
@@ -28,20 +28,8 @@ namespace fa
 		NormalizeInput(); // Optional: Normalize movement direction
 		AddActorLocationOffset(m_MoveInput * m_speed * dt * 5.0f); // Apply movement
 
-		if (m_PhysicsBody)
-		{
-			b2Vec2 velocity = m_PhysicsBody->GetLinearVelocity();
-			velocity.x = m_MoveInput.x * m_speed; // Apply horizontal input velocity
-			velocity.y = m_MoveInput.y * m_speed; // Apply vertical input velocity
-
-			m_PhysicsBody->SetLinearVelocity(velocity); // Set new velocity
-		}
-
 		m_MoveInput = Vector2f{ 0.0f, 0.0f }; // Reset input after applying
 
-		// apply graviyt?
-
-		PhysicsSystem::Get().Step(dt);
 	}
 
 	void Player::HandleInput(float dt)
@@ -130,6 +118,6 @@ namespace fa
 	{
 		Actor::BeginPlay();
 
-		SetEnablePhysics(true);
+
 	}
 }
