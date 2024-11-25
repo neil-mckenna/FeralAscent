@@ -5,6 +5,17 @@
 
 namespace fa {
 
+    /**
+     * @brief Constructs a Platform object in the Box2D world and initializes its SFML graphical representation.
+     *
+     * This constructor creates a static Box2D body representing a platform in the game world,
+     * along with a corresponding SFML rectangle shape that visually represents the platform in the game window.
+     * The platform is defined by its position and size, which are provided as arguments.
+     *
+     * @param world The Box2D world where the platform will be created.
+     * @param position The position of the platform in the game world (in pixels).
+     * @param size The size of the platform (in pixels), where the width and height are divided by 2 to account for Box2D's center origin.
+     */
     Platform::Platform(b2World& world, const sf::Vector2f& position, const sf::Vector2f& size) {
         // Initialize Box2D body
         b2BodyDef bodyDef;

@@ -21,7 +21,8 @@ namespace fa {
         m_BoundaryTop(nullptr),
         m_BoundaryBottom(nullptr),
         m_Player(nullptr),
-        m_World(nullptr)  // Initialize m_World to nullptr
+        m_World(nullptr),  // Initialize m_World to nullptr
+        m_GroundPlatform(nullptr)  // Initialize the ground platform pointer
     {
         // Initialize Box2D world and gravity
         b2Vec2 gravity(0.0f, -9.8f);  // Gravity vector
@@ -35,6 +36,10 @@ namespace fa {
 
         // Initialize the player at a starting position
         m_Player = new Player(m_World->GetB2World(), sf::Vector2f(512.0f, 384.0f));  // Center of the screen
+
+        // Create ground platform in the world
+        m_GroundPlatform = new fa::Platform(m_World->GetB2World(), sf::Vector2f(m_Window.getSize().x / 2.f, m_Window.getSize().y - 100.f), sf::Vector2f(m_Window.getSize().x, 20.0f));
+
     }
 
     void GameApplication::InitBoundaries() {
@@ -75,6 +80,8 @@ namespace fa {
         if (m_Player) {
             m_Player->Update(deltaTime);
         }
+
+
     }
 
     void GameApplication::Render() {
@@ -83,6 +90,10 @@ namespace fa {
 
         if (m_Player) {
             m_Player->Render(m_Window);  // Render the player
+        }
+
+        if (m_GroundPlatform) {
+            m_GroundPlatform->Render(m_Window);  // Render the ground platform
         }
 
         m_Window.display();
@@ -118,6 +129,8 @@ namespace fa {
 
     void GameApplication::Initialize() {
         // Any additional initialization steps can be placed here
+
+
     }
 
 }

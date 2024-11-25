@@ -40,6 +40,10 @@ namespace fa {
         // Player instance
         Player* m_Player;
 
+        // Add this declaration inside the class
+        fa::Platform* m_GroundPlatform;
+
+
         // Timed counter for game logic updates
         float m_Counter;
 
