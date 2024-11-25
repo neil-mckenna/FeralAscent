@@ -9,7 +9,7 @@ string GetResourceDir()
 #ifdef NDEBUG // release build
 	return "assets/";
 #else // debug
-	return "C:/Users/Reece/Documents/GitHub/FeralAscent/FeralAscentGame/assets/";
+	return "C:/Users/jakes/source/repos/FeralAscent/FeralAscentGame/assets/";
 #endif
 
 }

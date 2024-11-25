@@ -20,8 +20,7 @@ namespace fa
 		m_body{nullptr},
 		m_dynamic{true},
 		m_position{0,0}
-		m_PhysicsBody{nullptr},
-		m_PhysicsEnabled{false}
+
 
 	{
 		SetTexture(texturePath);

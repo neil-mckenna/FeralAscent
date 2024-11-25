@@ -17,7 +17,10 @@ namespace fa {
             m_Sprite.setTexture(m_RightWalkTextures[0]);
         }
 
-        m_Sprite.setOrigin(m_Sprite.getTexture()->getSize().x / 2, m_Sprite.getTexture()->getSize().y / 2);
+        if(m_Sprite.getTexture())
+        {
+            m_Sprite.setOrigin(m_Sprite.getTexture()->getSize().x / 2.f, m_Sprite.getTexture()->getSize().y / 2.f);
+        }
 
         // Initialize physics
         InitPhysics(world, position);
