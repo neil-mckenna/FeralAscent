@@ -20,6 +20,7 @@ namespace fa
 		Actor(World* owningWorld, const string &texturePath = "");
 
 		string m_ActorName = "";
+		bool m_facingLeft = true;
 
 		virtual void BeginPlay();
 		void BeginPlayInternal();
@@ -45,6 +46,8 @@ namespace fa
 		Vector2f GetActorRightDirection() const;
 
 		void RescaleActor(float scaleXAmt, float scaleYAmt);
+		void FaceLeft();
+		void FaceRight();
 
 		Vector2u GetWindowSize() const;
 
