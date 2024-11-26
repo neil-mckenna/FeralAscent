@@ -1,12 +1,21 @@
 #include "framework/Player.h"
+#include "framework/World.h"
+#include <framework/Actor.h>
 #include <SFML/Window/Keyboard.hpp>
 #include <cmath> // For std::sqrt
 #include "framework/Utilities.h"
 
 namespace fa {
 
-    Player::Player(b2World& world, const sf::Vector2f& position)
-        : m_CurrentFrame(0), m_AnimationTimer(0.0f), m_FrameDuration(0.1f), m_IsMovingRight(false), m_IsMovingLeft(false) {
+
+
+    Player::Player(World* owningWorld, const sf::Vector2f& position) :
+        Actor(owningWorld, position, "assets/PNG/player/walking_sprites/right_walk_1.png"),  // Inherit physics from Actor
+        m_CurrentFrame(0),
+        m_AnimationTimer(0.0f),
+        m_FrameDuration(0.1f),
+        m_IsMovingRight(false),
+        m_IsMovingLeft(false) {
 
         // Load walking textures for right and left animations
         LoadTextures("assets/PNG/player/walking_sprites/right_walk_", 9, m_RightWalkTextures);
@@ -23,7 +32,7 @@ namespace fa {
         }
 
         // Initialize physics
-        InitPhysics(world, position);
+        InitPhysics(owningWorld->GetB2World(), position);
     }
 
     void Player::LoadTextures(const std::string& prefix, int frameCount, std::vector<sf::Texture>& textures) {
@@ -102,6 +111,8 @@ namespace fa {
         // Render the sprite
         window.draw(m_Sprite);
     }
+
+
 
     Player::~Player() {
         // Cleanup Box2D body if necessary

@@ -33,8 +33,9 @@ template<typename T>
 using Set = unordered_set<T>;
 
 
-// macro
+// Logging macros
 #define LOG(M, ...) printf(M "\n", ##__VA_ARGS__)
-
+#define LOG_INFO(M, ...) printf("[INFO] " M "\n", ##__VA_ARGS__)
+#define LOG_ERROR(M, ...) printf("[ERROR] " M "\n", ##__VA_ARGS__)
 }
 

@@ -3,12 +3,15 @@
 #include "framework/World.h"
 #include "framework/Platform.h"
 #include "framework/Player.h"
+#include "framework/Core.h"
 #include <SFML/Graphics.hpp>
 
 // Factory method to create a game application derived from the application class
 fa::Application* GetApplication() {
     return new fa::GameApplication();
 }
+
+using namespace std;
 
 namespace fa {
 
@@ -24,9 +27,18 @@ namespace fa {
         m_World(nullptr),  // Initialize m_World to nullptr
         m_GroundPlatform(nullptr)  // Initialize the ground platform pointer
     {
+
+
         // Initialize Box2D world and gravity
         b2Vec2 gravity(0.0f, -9.8f);  // Gravity vector
         m_World = new World(this, gravity);  // Pass gravity to World constructor
+
+        // Enable debug draw flags
+        uint32 debugFlags = 0;
+        debugFlags |= b2Draw::e_shapeBit;           // Draw shapes
+        debugFlags |= b2Draw::e_jointBit;           // Draw joints
+        debugFlags |= b2Draw::e_centerOfMassBit;    // Draw centers of mass
+        m_DebugDraw.SetFlags(debugFlags);
 
         // Initialize debug draw for Box2D
         m_World->GetB2World().SetDebugDraw(&m_DebugDraw);
@@ -34,11 +46,25 @@ namespace fa {
         // Initialize boundaries to keep player inside the screen
         InitBoundaries();
 
-        // Initialize the player at a starting position
-        m_Player = new Player(m_World->GetB2World(), sf::Vector2f(512.0f, 384.0f));  // Center of the screen
+
+        // Initialize the player at a starting position, use shared_ptr instead of unique_ptr
+        m_Player = make_unique<Player>(m_World, sf::Vector2f(m_Window.getSize().x / 2.f, 100.f));  // Center of the screen
 
         // Create ground platform in the world
-        m_GroundPlatform = new fa::Platform(m_World->GetB2World(), sf::Vector2f(m_Window.getSize().x / 2.f, m_Window.getSize().y - 100.f), sf::Vector2f(m_Window.getSize().x, 20.0f));
+        m_GroundPlatform = new fa::Platform(
+            m_World,
+            sf::Vector2f(m_Window.getSize().x / 2.f, m_Window.getSize().y - 100.f),
+            sf::Vector2f(m_Window.getSize().x, 20.0f),
+            "assets/PNG/terrain/land_sprites/tile000.png"
+        );
+
+        // Add player to the world, cast Player to Actor
+        m_World->AddActor(m_Player.get());  // Player is now a make_unique<Actor>
+
+        m_World->AddActor(m_BoundaryTop);
+        m_World->AddActor(m_BoundaryLeft);
+        m_World->AddActor(m_BoundaryRight);
+        m_World->AddActor(m_BoundaryBottom);
 
     }
 
@@ -47,10 +73,32 @@ namespace fa {
         float windowHeight = 768.0f;
         float boundaryThickness = 10.0f;
 
-        m_BoundaryLeft = new Platform(m_World->GetB2World(), sf::Vector2f(0, windowHeight / 2), sf::Vector2f(boundaryThickness, windowHeight));
-        m_BoundaryRight = new Platform(m_World->GetB2World(), sf::Vector2f(windowWidth - boundaryThickness, windowHeight / 2), sf::Vector2f(boundaryThickness, windowHeight));
-        m_BoundaryTop = new Platform(m_World->GetB2World(), sf::Vector2f(windowWidth / 2, 0), sf::Vector2f(windowWidth, boundaryThickness));
-        m_BoundaryBottom = new Platform(m_World->GetB2World(), sf::Vector2f(windowWidth / 2, windowHeight - boundaryThickness), sf::Vector2f(windowWidth, boundaryThickness));
+        m_BoundaryLeft = new Platform(
+            m_World, // world ptr
+            sf::Vector2f(0, windowHeight / 2), // pos
+            sf::Vector2f(boundaryThickness, windowHeight), // location
+            "assets/PNG/terrain/land_sprites/tile000.png" // texture
+        );
+
+        m_BoundaryRight = new Platform(
+            m_World,
+            sf::Vector2f(windowWidth - boundaryThickness, windowHeight / 2),
+            sf::Vector2f(boundaryThickness, windowHeight),
+            "assets/PNG/terrain/land_sprites/tile000.png"
+        );
+
+        m_BoundaryTop = new Platform(
+            m_World,
+            sf::Vector2f(windowWidth / 2, 0),
+            sf::Vector2f(windowWidth, boundaryThickness),
+            "assets/PNG/terrain/land_sprites/tile000.png"
+        );
+        m_BoundaryBottom = new Platform(
+            m_World,
+            sf::Vector2f(windowWidth / 2, windowHeight - boundaryThickness),
+            sf::Vector2f(windowWidth, boundaryThickness),
+            "assets/PNG/terrain/land_sprites/tile000.png"
+        );
     }
 
     void GameApplication::HandleEvents() {
@@ -64,17 +112,18 @@ namespace fa {
                     m_Window.close();  // Close the window if Escape key is pressed
                 }
             }
-            else if (event.type == sf::Event::Resized) {
-                // Handle window resizing
-                sf::FloatRect visibleArea(0, 0, event.size.width, event.size.height);
-                m_Window.setView(sf::View(visibleArea));
-            }
+
         }
     }
 
     void GameApplication::Update(float deltaTime) {
         m_Counter += deltaTime;
+
+        //LOG("Game Application is updating");
+
         m_World->Update(deltaTime);  // Update Box2D world (e.g., physics)
+
+
 
         // Update player movement (e.g., simple left/right movement)
         if (m_Player) {
@@ -85,7 +134,10 @@ namespace fa {
     }
 
     void GameApplication::Render() {
-        m_Window.clear();
+
+        // make screen background white
+        m_Window.clear(sf::Color::White);
+
         m_World->Render(m_Window);  // Render the world and all its actors
 
         if (m_Player) {
@@ -105,7 +157,6 @@ namespace fa {
         delete m_BoundaryRight;
         delete m_BoundaryTop;
         delete m_BoundaryBottom;
-        delete m_Player;
         delete m_World;
     }
 

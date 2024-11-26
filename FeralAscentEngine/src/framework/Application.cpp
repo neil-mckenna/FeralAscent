@@ -75,6 +75,7 @@ namespace fa {
     // Destructor
     Application::~Application()
     {
+
         std::cout << "Application destroyed." << std::endl;
     }
 

@@ -37,13 +37,27 @@ namespace fa {
         // Set gravity for the world
         void SetGravity(const b2Vec2& gravity);
 
+        // Methods to manage actors
+        void AddActor(std::shared_ptr<Actor> actor);  // Add actor to active list
+        void AddActor(Actor* actor);
+        void RemoveActor(std::shared_ptr<Actor> actor);  // Remove actor from active list
+        void AddPendingActor(std::shared_ptr<Actor> actor);  // Add actor to pending list
+        void RemovePendingActor(std::shared_ptr<Actor> actor);  // Remove actor from pending list
+        void CleanPendingActors();  // Transfer pending actors to active list
+
+
 
     private:
 
         Application* m_owningApp;  // Pointer to the owning application
         bool m_BeginPlay;  // Flag to track if the world has started
+        b2World b2WorldInstance;  // Box2D world instance for physics simulations
+
         std::vector<std::shared_ptr<Actor>> m_Actors;  // List of actors in the world
         std::vector<std::shared_ptr<Actor>> m_pendingActors;  // List of pending actors to add
-        b2World b2WorldInstance;  // Box2D world instance for physics simulations
+
+
+
+
     };
 }

@@ -3,8 +3,8 @@
 
 namespace fa
 {
-	Enemy::Enemy(World* owningWorld, const string& texturePath) :
-		Actor{ owningWorld, texturePath },
+	Enemy::Enemy(World* owningWorld, Vector2f position, const string& texturePath) :
+		Actor{ owningWorld, position, texturePath },
 		m_speed{ 125.0f },
 		m_MoveInput{ 0.0f, 0.0f }
 	{

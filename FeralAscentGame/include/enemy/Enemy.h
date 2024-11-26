@@ -10,7 +10,7 @@ namespace fa
 	class Enemy : public Actor
 	{
 	public:
-		Enemy(World* owningWorld, const string& texturePath = "");
+		Enemy(World* owningWorld, Vector2f position, const string& texturePath = "");
 		virtual void Update(float dt);
 
 		float GetSpeed() const { return m_speed; }

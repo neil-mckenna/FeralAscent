@@ -17,7 +17,7 @@ namespace fa
 	class Actor : public Object
 	{
 	public:
-		Actor(World* owningWorld, const string &texturePath = "");
+		Actor(World* owningWorld, Vector2f position, const string &texturePath = "");
 
 		string m_ActorName = "";
 		bool m_facingLeft = true;
@@ -29,7 +29,7 @@ namespace fa
 		void LogActorDetails();
 		void UpdateInternal(float dt);
 
-		void SetTexture(const string texturePath);
+		void SetTexture(const string& texturePath);
 
 		void Render(RenderWindow &window);
 

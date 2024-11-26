@@ -13,7 +13,7 @@ namespace fa {
     public:
         // Constructor & Destructor
         GameApplication();
-        virtual ~GameApplication();
+        virtual ~GameApplication() override;
 
         // Main game loop functions
         void Run();
@@ -37,8 +37,8 @@ namespace fa {
         // Debug draw for Box2D
         DebugDraw m_DebugDraw;
 
-        // Player instance
-        Player* m_Player;
+        // Player actor (using smart pointer for automatic memory management)
+        std::unique_ptr<Player> m_Player;
 
         // Add this declaration inside the class
         fa::Platform* m_GroundPlatform;
@@ -52,6 +52,8 @@ namespace fa {
         Platform* m_BoundaryRight;
         Platform* m_BoundaryTop;
         Platform* m_BoundaryBottom;
+
+
 
         // Quit button (if adding custom buttons)
         sf::RectangleShape m_QuitButton;

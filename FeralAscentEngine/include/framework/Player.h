@@ -3,15 +3,17 @@
 
 #include <SFML/Graphics.hpp>
 #include <Box2D/Box2D.h>
+#include <framework/Actor.h>
+#include <framework/World.h>
 #include <vector>
 #include <string>
 
 namespace fa {
 
-    class Player {
+    class Player : public Actor {
     public:
         // Constructor and destructor
-        Player(b2World& world, const sf::Vector2f& position);
+        Player(World* world, const sf::Vector2f& position);
         ~Player();
 
         // Update the player (movement and animation)

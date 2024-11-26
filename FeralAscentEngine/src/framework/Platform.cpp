@@ -16,12 +16,24 @@ namespace fa {
      * @param position The position of the platform in the game world (in pixels).
      * @param size The size of the platform (in pixels), where the width and height are divided by 2 to account for Box2D's center origin.
      */
-    Platform::Platform(b2World& world, const sf::Vector2f& position, const sf::Vector2f& size) {
+    Platform::Platform(World* world, const sf::Vector2f& position, const sf::Vector2f& size, const string texturePath = "assets/PNG/terrain/land_sprites/tile000.png") :
+        Actor(world, position, texturePath),
+        m_Body{nullptr}
+    {
+        if (world == nullptr)
+        {
+            LOG_ERROR("World is NULL in Platform constructor.");
+            return;
+        }
+
+        // Access Box2D world directly
+        b2World& b2w = world->GetB2World();
+
         // Initialize Box2D body
         b2BodyDef bodyDef;
         bodyDef.position.Set(PixelsToMeters(position.x), PixelsToMeters(position.y));
         bodyDef.type = b2_staticBody;
-        m_Body = world.CreateBody(&bodyDef);
+        m_Body = b2w.CreateBody(&bodyDef);
 
         b2PolygonShape boxShape;
         boxShape.SetAsBox(PixelsToMeters(size.x / 2.0f), PixelsToMeters(size.y / 2.0f)); // Half-size for Box2D
@@ -38,6 +50,8 @@ namespace fa {
         m_Rect.setPosition(position);
         m_Rect.setFillColor(sf::Color::Red); // Example color
     }
+
+
 
 
     void Platform::Render(sf::RenderWindow& window) {
