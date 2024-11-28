@@ -1,254 +1,113 @@
 #include "framework/Actor.h"
 #include "framework/Core.h"
-#include "framework/AssetManager.h"
-#include "framework/MathUtility.h"
-#include "framework/World.h"
-#include <sstream>
-#include <string>
+#include "framework/Component.h"
+#include "framework/TextureComponent.h"
+#include "framework/PhysicsComponent.h"
+#include <SFML/Graphics.hpp>
 
-#include <box2d/b2_body.h>
+namespace fa {
 
-using namespace std;
+    Actor::Actor(World* owningWorld, const sf::Vector2f& position, const std::string& texturePath) :
+        m_owningWorld{ owningWorld },
+        m_Position{ position },
+        m_TexturePath{ texturePath},
+        m_TextureComponent{ new TextureComponent(texturePath)}
 
-namespace fa
-{
-    /**
-     * @brief Constructs an Actor object and initializes its physics body in the world.
-     *
-     * This constructor initializes an Actor by setting its texture, position, and Box2D physics body.
-     * The actor is added to the provided world and given a dynamic or static body type based on the
-     * m_dynamic flag. A Box2D body with a rectangular shape is created, and the appropriate fixture
-     * (shape and properties) is applied to it.
-     *
-     * @param owningWorld Pointer to the World that owns this Actor.
-     * @param texturePath Path to the texture to be applied to the Actor's sprite.
-     */
-    Actor::Actor(World* owningWorld, Vector2f position, const string& texturePath) :
-        m_owningWorld(owningWorld),
-        m_hasBeganPlay(false),
-        m_Sprite{},
-        m_Texture{},
-        m_body{ nullptr },
-        m_dynamic{ true },
-        m_position{ position }
     {
-        // Set texture before setting up Box2D body
-        SetTexture(texturePath);
+        m_ActorName = "Actor name";
 
-        if (!m_Texture) {
-            LOG_ERROR("Texture loading failed for: %s", texturePath.c_str());
-            return; // Exit constructor if texture is not loaded
-        }
 
-        // Define the Box2D body after the texture is loaded
-        b2BodyDef bodyDef;
-        bodyDef.type = m_dynamic ? b2_dynamicBody : b2_staticBody;
-        bodyDef.position.Set(m_position.x, m_position.y);
+        InitializeComponents(texturePath);
 
-        m_body = m_owningWorld->GetB2World().CreateBody(&bodyDef);
 
-        b2PolygonShape dynamicBox;
-        dynamicBox.SetAsBox(m_Sprite.getGlobalBounds().width / 2.0f, m_Sprite.getGlobalBounds().height / 2.0f);
-
-        b2FixtureDef fixtureDef;
-        fixtureDef.shape = &dynamicBox;
-        fixtureDef.density = 1.0f;
-        fixtureDef.friction = 0.3f;
-        m_body->CreateFixture(&fixtureDef);
     }
 
-    void Actor::SetTexture(const string& texturePath)
+    void Actor::InitializeComponents(const std::string& texturePath)
     {
-        // Call singleton to load texture
-        m_Texture = AssetManager::Get().LoadTexture(texturePath);
+        // Initialize the texture component
+        auto textureComponent = std::make_shared<TextureComponent>(texturePath);
+        AddComponent(textureComponent);
 
-        // Check if texture loading failed
-        if (!m_Texture)
-        {
-            LOG_ERROR("Failed to load texture: %s", texturePath.c_str());
-            return;
-        }
+        // Initialize PhysicsComponent
+        //m_PhysicsComponent = std::make_shared<PhysicsComponent>(m_owningWorld->GetB2World(), position);
+        //AddComponent(m_PhysicsComponent);  // Add physics component to actor
 
-        // Successfully loaded the texture
-        LOG("[DEBUG] Loaded texture: %s", texturePath.c_str());
+        // Ensure the texture component exists and has a valid texture
+        if (m_TextureComponent && m_TextureComponent->GetTexture()) {
+            // Get the texture from the component
+            sf::Texture* texture = m_TextureComponent->GetTexture();
 
-        // Set the texture to the sprite
-        m_Sprite.setTexture(*m_Texture);
+            // Set the texture to the sprite inside the component
+            m_TextureComponent->GetSprite().setTexture(*texture);
 
-        // Get texture width and height
-        int textureWidth = m_Texture->getSize().x;
-        int textureHeight = m_Texture->getSize().y;
-
-        // Debug texture size
-        LOG("[DEBUG] Texture size - Width: %d, Height: %d", textureWidth, textureHeight);
-
-        // Set texture rectangle based on texture size
-        m_Sprite.setTextureRect(sf::IntRect(sf::Vector2i{ 0, 0 }, sf::Vector2i{ textureWidth, textureHeight }));
-
-        // Center the origin of the sprite (pivot)
-        CenterPivot();
-        LOG("[DEBUG] Texture origin centered.");
-    }
-
-    void Actor::BeginPlayInternal()
-    {
-        if (!m_hasBeganPlay)
-        {
-            m_hasBeganPlay = true;
-            BeginPlay();
-        }
-    }
-
-    void Actor::BeginPlay()
-    {
-        LOG("Actor : %s : Created!", m_ActorName.c_str());
-    }
-
-    void Actor::Update(float dt)
-    {
-        LogActorDetails();
-    }
-
-    void Actor::LogActorDetails()
-    {
-        stringstream logMessage;
-
-        logMessage << "Dynamic: " << (m_dynamic ? "true" : "false") << "\n";
-
-        //LOG("Actor details:  %s", logMessage.str());
-    }
-
-    void Actor::UpdateInternal(float dt)
-    {
-        if (!IsPendingDestroy())
-        {
-            Update(dt);
-        }
-    }
-
-    void Actor::Render(RenderWindow& window)
-    {
-        if (m_dynamic) {
-            m_Sprite.setColor(sf::Color::Green); // Green for dynamic
+            // Set the origin of the sprite to the center of the texture
+            m_TextureComponent->GetSprite().setOrigin(texture->getSize().x / 2.f, texture->getSize().y / 2.f);
         }
         else {
-            m_Sprite.setColor(sf::Color::Red); // Red for static
+            LOG_ERROR("Texture component is missing or texture is not set.");
         }
 
-        window.draw(m_Sprite);
+
     }
 
-    void Actor::SetActorLocation(const Vector2f& newLocation)
-    {
-        m_Sprite.setPosition(newLocation);
+    Actor::~Actor() {
+        // Destructor logic for cleanup (if needed)
+        LOG_WARNING("Actor was destroyed! Check if this is the approtiate methid call");
     }
 
-    void Actor::SetActorRotation(const float newRot)
-    {
-        m_ActorRotation = newRot;
+    // Update all components of the actor
+    void Actor::Update(float dt) {
+        for (auto& component : m_Components) {
+            component->Update(dt);
+        }
     }
 
-    Vector2f Actor::GetActorLocation() const
-    {
-        return m_Sprite.getPosition();
-    }
-
-    float Actor::GetActorRotation() const
-    {
-        return m_ActorRotation;
-    }
-
-    void Actor::AddActorLocationOffset(const Vector2f& offsetAmt)
-    {
-        SetActorLocation(GetActorLocation() + offsetAmt);
-    }
-
-    void Actor::AddActorLocationOffset(float rotOffsetAmt)
-    {
-        SetActorRotation(GetActorRotation() + rotOffsetAmt);
-    }
-
-    Vector2f Actor::GetActorForwardDirection() const
-    {
-        return RotationToVector(GetActorRotation());
-    }
-
-    Vector2f Actor::GetActorRightDirection() const
-    {
-        return RotationToVector(GetActorRotation() + 90);
-    }
-
-    void Actor::RescaleActor(float scaleXAmt, float scaleYAmt)
-    {
-        m_Sprite.setScale(scaleXAmt, scaleYAmt);
-    }
-
-    void Actor::FaceLeft()
-    {
-        m_Sprite.setScale(-1.f, 1.f);
-        m_facingLeft = true;
-    }
-
-    void Actor::FaceRight()
-    {
-        m_Sprite.setScale(1.f, 1.f);
-        m_facingLeft = false;
-    }
-
-    Vector2u Actor::GetWindowSize() const
-    {
-        return m_owningWorld->GetWindowSize();
-    }
-
-    FloatRect Actor::GetActorGlobalBounds() const
-    {
-        return m_Sprite.getGlobalBounds();
-    }
-
-    void Actor::SetSpriteRotation(float newRot) {
-        m_Sprite.setRotation(newRot); // Rotate the sprite independently
-    }
-
-    float Actor::GetSpriteRotation() const {
-        return m_Sprite.getRotation(); // Get the current sprite rotation
-    }
-
-    void Actor::CenterPivot()
-    {
-        FloatRect bounds = m_Sprite.getGlobalBounds();
-        m_Sprite.setOrigin(bounds.width / 2.f, bounds.height / 2.f);
-    }
-
-    bool Actor::IsActorOutOfWindowBounds() const
-    {
-        float windowWidth = GetWorld()->GetWindowSize().x;
-        float windowHeight = GetWorld()->GetWindowSize().y;
-
-        float actorWidth = GetActorGlobalBounds().width;
-        float actorHeight = GetActorGlobalBounds().height;
-
-        Vector2f actorPos = GetActorLocation();
-
-        if (actorPos.x < -actorWidth || actorPos.x >(windowWidth + actorWidth))
-        {
-            return true;
+    // Render all components that need to be rendered (e.g., TextureComponent)
+    void Actor::Render(sf::RenderWindow& window) {
+        if (m_Components.empty()) {
+            LOG_ERROR("Actor has no components to render.");
         }
 
-        if (actorPos.y < -actorHeight || actorPos.y >(windowHeight + actorHeight))
-        {
-            return true;
+        for (auto& component : m_Components) {
+            if (!component) {
+                LOG_ERROR("A component in m_Components is nullptr.");
+                continue;  // Skip to the next component
+            }
+
+            // Attempt to cast to TextureComponent
+            auto textureComponent = dynamic_cast<TextureComponent*>(component.get());
+
+            if (textureComponent) {
+                try {
+                    textureComponent->Render(window);  // Render the texture component if it exists
+                }
+                catch (const std::exception& e) {
+                    LOG("Error rendering texture component: %s", string(e.what()));
+                }
+            }
+            else {
+                LOG_ERROR("Component is not a TextureComponent. Skipping render.");
+            }
         }
-
-        return false;
     }
 
-    void Actor::Destroy()
-    {
-        Object::Destroy();
+    // Add a component to the actor
+    void Actor::AddComponent(std::shared_ptr<Component> component) {
+        m_Components.push_back(component);
     }
 
-    Actor::~Actor()
-    {
-        LOG("Ahhhhhh!!!! ------------ Actor %s Destroyed", m_ActorName.c_str());
+
+
+    // Retrieve a component of a specific type (returns nullptr if not found)
+    template<typename T>
+    T* Actor::GetComponent() const {
+        for (auto& component : m_Components) {
+            T* foundComponent = dynamic_cast<T*>(component.get());
+            if (foundComponent) {
+                return foundComponent;
+            }
+        }
+        return nullptr;  // Return nullptr if no matching component is found
     }
+
 }

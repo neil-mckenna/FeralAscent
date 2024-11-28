@@ -16,7 +16,7 @@ namespace fa
 		Actor::Update(dt);
 		HandleInput(dt); // Process input to update movement
 		NormalizeInput(); // Optional: Normalize movement direction
-		AddActorLocationOffset(m_MoveInput * m_speed * dt * 100.0f); // Apply movement
+		//AddActorLocationOffset(m_MoveInput * m_speed * dt * 100.0f); // Apply movement
 		m_MoveInput = Vector2f{ 0.0f, 0.0f }; // Reset input after applying
 
 
@@ -47,7 +47,7 @@ namespace fa
 
 	void Enemy::BeginPlay()
 	{
-		Actor::BeginPlay();
+		//Actor::BeginPlay();
 
 
 	}

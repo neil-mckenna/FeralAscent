@@ -2,11 +2,15 @@
 
 #include <vector>
 #include <memory>
-#include "framework/Actor.h"
 #include "framework/Application.h"
 #include "framework/Core.h"
 #include <Box2D/Box2D.h>
 #include <SFML/Graphics.hpp>
+
+// Forward declaration of Actor class to avoid circular dependencies
+namespace fa {
+    class Actor;
+}
 
 namespace fa {
 
@@ -39,25 +43,20 @@ namespace fa {
 
         // Methods to manage actors
         void AddActor(std::shared_ptr<Actor> actor);  // Add actor to active list
-        void AddActor(Actor* actor);
+        void AddActor(Actor* actor);  // Add actor to active list (from raw pointer)
         void RemoveActor(std::shared_ptr<Actor> actor);  // Remove actor from active list
-        void AddPendingActor(std::shared_ptr<Actor> actor);  // Add actor to pending list
-        void RemovePendingActor(std::shared_ptr<Actor> actor);  // Remove actor from pending list
-        void CleanPendingActors();  // Transfer pending actors to active list
+        void LogActors();  // debuging
 
+        void ClearAllActors();
 
-
-    private:
-
-        Application* m_owningApp;  // Pointer to the owning application
-        bool m_BeginPlay;  // Flag to track if the world has started
-        b2World b2WorldInstance;  // Box2D world instance for physics simulations
-
+    protected:
         std::vector<std::shared_ptr<Actor>> m_Actors;  // List of actors in the world
         std::vector<std::shared_ptr<Actor>> m_pendingActors;  // List of pending actors to add
 
-
-
+    private:
+        Application* m_owningApp;  // Pointer to the owning application
+        bool m_BeginPlay;  // Flag to track if the world has started
+        b2World b2WorldInstance;  // Box2D world instance for physics simulations
 
     };
 }

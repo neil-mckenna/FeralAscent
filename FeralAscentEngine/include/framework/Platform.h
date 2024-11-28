@@ -17,8 +17,9 @@ namespace fa {
         void Render(sf::RenderWindow& window);
 
     private:
-        b2Body* m_Body;             ///< Box2D body
-        sf::RectangleShape m_Rect;  ///< SFML rectangle for visual representation
+        b2Body* m_Body;
+        sf::RectangleShape m_Rect;
+
     };
 
 } // namespace fa

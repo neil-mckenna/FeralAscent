@@ -6,6 +6,7 @@
 #include "framework/Player.h"
 #include "framework/Platform.h"
 #include "framework/DebugDraw.h"
+#include "framework/Core.h"
 
 namespace fa {
 
@@ -18,6 +19,9 @@ namespace fa {
         // Main game loop functions
         void Run();
         void Initialize();
+        void SetupDebug();
+        void InitializePlayer();
+
         void Update(float deltaTime);
         void Render();
 
@@ -28,30 +32,26 @@ namespace fa {
         // Handle input events (key press, mouse click, etc.)
         void HandleEvents();
 
-        // SFML window to render the game
-        sf::RenderWindow m_Window;
-
         // Game world instance
-        World* m_World;
+        unique<World> m_World;
 
         // Debug draw for Box2D
         DebugDraw m_DebugDraw;
 
-        // Player actor (using smart pointer for automatic memory management)
-        std::unique_ptr<Player> m_Player;
-
-        // Add this declaration inside the class
-        fa::Platform* m_GroundPlatform;
-
-
         // Timed counter for game logic updates
         float m_Counter;
 
+        // Player actor (using smart pointer for automatic memory management)
+        unique<Player> m_Player;
+
+        // Add this declaration inside the class
+        unique<Platform> m_GroundPlatform;
+
         // Boundaries (platforms acting as walls)
-        Platform* m_BoundaryLeft;
-        Platform* m_BoundaryRight;
-        Platform* m_BoundaryTop;
-        Platform* m_BoundaryBottom;
+        unique<Platform> m_BoundaryLeft;
+        unique<Platform> m_BoundaryRight;
+        unique<Platform> m_BoundaryTop;
+        unique<Platform> m_BoundaryBottom;
 
 
 

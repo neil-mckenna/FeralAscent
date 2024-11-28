@@ -13,7 +13,7 @@ namespace fa {
     class Player : public Actor {
     public:
         // Constructor and destructor
-        Player(World* world, const sf::Vector2f& position);
+        Player(World* world, const sf::Vector2f& position, const string& texturePath);
         ~Player();
 
         // Update the player (movement and animation)
@@ -36,15 +36,14 @@ namespace fa {
         float m_AnimationTimer;                        // Timer to control frame changes
         float m_FrameDuration;                         // Duration of each frame
 
-        // Movement direction flags
-        bool m_IsMovingRight;
-        bool m_IsMovingLeft;
 
         // SFML sprite and texture
         sf::Sprite m_Sprite;
 
         // Box2D physics body
         b2Body* m_Body;
+
+
     };
 
 } // namespace fa

@@ -1,92 +1,47 @@
 #pragma once
 
-#include "framework/Object.h"
-#include "framework/Core.h"
-#include <SFML/Graphics.hpp>
-#include <box2d/b2_body.h>
+#include <vector>
+#include <memory>
+#include "framework/Component.h"
+#include "framework/TextureComponent.h"
+#include "framework/PhysicsComponent.h"
 
 using namespace std;
 using namespace sf;
 
-class b2Body;
 
-namespace fa
-{
-	class World;
+namespace fa {
 
-	class Actor : public Object
-	{
-	public:
-		Actor(World* owningWorld, Vector2f position, const string &texturePath = "");
+    class World;
+    class Actor {
+    public:
+        Actor(World* owningWorld, const sf::Vector2f& position, const std::string& texturePath);
+        virtual ~Actor();
 
-		string m_ActorName = "";
-		bool m_facingLeft = true;
+        // Update the actor and all of its components
+        virtual void Update(float dt);
+        virtual void Render(RenderWindow& window);
 
-		virtual void BeginPlay();
-		void BeginPlayInternal();
+        // Add components to the actor
+        void AddComponent(shared_ptr<Component> component);
 
-		virtual void Update(float dt);
-		void LogActorDetails();
-		void UpdateInternal(float dt);
+        // Access components
+        template<typename T>
+        T* GetComponent() const;
 
-		void SetTexture(const string& texturePath);
-
-		void Render(RenderWindow &window);
-
-		void SetActorLocation(const Vector2f& newLocation);
-		void SetActorRotation(float newRot);
-
-		Vector2f GetActorLocation() const;
-		float GetActorRotation() const;
-
-		void AddActorLocationOffset(const Vector2f& offsetAmt);
-		void AddActorLocationOffset(float rotOffsetAmt);
-
-		Vector2f GetActorForwardDirection() const;
-		Vector2f GetActorRightDirection() const;
-
-		void RescaleActor(float scaleXAmt, float scaleYAmt);
-		void FaceLeft();
-		void FaceRight();
-
-		Vector2u GetWindowSize() const;
-
-		FloatRect GetActorGlobalBounds() const;
-
-		// new functions
-		void SetSpriteRotation(float newRot);
-		float GetSpriteRotation() const;
-
-		World* GetWorld() const { return m_owningWorld; }
-
-		bool IsActorOutOfWindowBounds() const;
-
-		virtual void Destroy() override;
-
-		// destructor
-		virtual ~Actor();
-
-	protected:
-
-	private:
-		World* m_owningWorld;
-		bool m_hasBeganPlay;
+    protected:
+        string m_ActorName; // hold the path string temporary
+        shared_ptr<TextureComponent> m_TextureComponent;  // Texture component
+        shared_ptr<PhysicsComponent> m_PhysicsComponent;  // Physics component
+        vector<shared_ptr<Component>> m_Components;  // Store components
+        void InitializeComponents(const std::string& texturePath);  // Initialize components in the actor
 
 
-		float m_ActorRotation = 0.0f;
-		Sprite m_Sprite;
-		shared<Texture> m_Texture;
+    private:
+        World* m_owningWorld;  // Pointer to the owning world
+        Vector2f m_Position;  // Position of the actor
+        string m_TexturePath; // hold the path string temporary
 
-		void CenterPivot();
-
-		bool m_dynamic;
-		Vector2i m_position;
-		b2Body* m_body;
-
-
-	};
-
-
-
+    };
 
 }

@@ -3,23 +3,19 @@
 
 namespace fa
 {
-	Object::Object() : m_isPendingDestroy{false}
-	{
+    Object::Object() : m_isPendingDestroy{ false }
+    {
+        // Initialization can be done here if needed
+    }
 
+    void Object::Destroy()
+    {
+        m_isPendingDestroy = true;
+        LOG("Object marked for destruction");
+    }
 
-	}
-
-	void Object::Destroy()
-	{
-		m_isPendingDestroy = true;
-	}
-
-
-	Object::~Object()
-	{
-		LOG("Object destroyed");
-	}
-
+    Object::~Object()
+    {
+        LOG("Object destroyed");
+    }
 }
-
-
