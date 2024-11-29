@@ -1,39 +1,46 @@
-#pragma once
+#ifndef PHYSICSCOMPONENT_H
+#define PHYSICSCOMPONENT_H
 
-#include <Box2D/Box2D.h>
 #include "framework/Component.h"
+#include <Box2D/Box2D.h>
+#include <SFML/Graphics.hpp>
 
 namespace fa {
 
     class PhysicsComponent : public Component {
     public:
-        // Constructor: Initializes the component with a Box2D body definition
-        PhysicsComponent(b2BodyDef bodyDef);
+        // Constructor initializes the body and physics environment
+        PhysicsComponent(b2World* b2world, const sf::Vector2f& position);
 
-        // Destructor: cleans up the Box2D body when the component is destroyed
+        // Destructor cleans up Box2D body
         ~PhysicsComponent();
 
-        // Override Update method for physics updates (empty for now, could be extended)
-        void Update(float dt) override;
+        // Update the physics component (called once per frame)
+        void Update(float dt);
 
-        // Accessor for the Box2D body
+        // Apply velocity to the physics body
+        void ApplyVelocity(const sf::Vector2f& velocity, float dt);
+
+        // Get the Box2D body for external interaction
         b2Body* GetBody() const;
 
-        // Set the Box2D body's position
-        void SetPosition(const b2Vec2& position);
+        sf::Vector2f GetPosition() const;
 
-        // Apply force to the body
-        void ApplyForce(const b2Vec2& force);
+        // Render the physics body for debugging purposes
+        void Render(sf::RenderWindow& window);
 
-        // Set the Box2D body to a new definition (e.g., after changing velocity)
-        void SetBodyDefinition(b2BodyDef newDef);
+        // Handle movement: Apply velocity to the physics body based on direction and speed
+        void HandleMovement(const sf::Vector2f& direction, float dt);
 
     private:
-        // Box2D body for the physics component
-        b2Body* m_Body;
+        // Initialize the physics body in Box2D
+        void InitializeBody(const sf::Vector2f& position);
 
-        // World that holds the body (used for cleanup)
-        b2World* m_World;
+        b2World* m_B2World;  // Box2D world instance
+        b2Body* m_Body;      // Box2D body for the actor
+        sf::CircleShape m_DebugShape;  // Shape used for debugging purposes (visualize physics body)
     };
 
-}
+}  // namespace fa
+
+#endif  // PHYSICSCOMPONENT_H

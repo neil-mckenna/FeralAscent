@@ -1,4 +1,5 @@
 #include "framework/Player.h"
+#include "framework/AssetManager.h"
 #include "framework/World.h"
 #include <framework/Actor.h>
 #include <SFML/Window/Keyboard.hpp>
@@ -34,8 +35,8 @@ namespace fa {
         Actor(owningWorld, position, texturePath),  // Inherit physics from Actor
         m_CurrentFrame(0),
         m_AnimationTimer(0.0f),
-        m_FrameDuration(0.1f)
-
+        m_FrameDuration(0.1f),
+        m_PlayerTexturePath(texturePath)
 
     {
         LOG("Player Constructor: owningWorld=%p, position=(%f, %f), texturePath=%s",
@@ -52,24 +53,15 @@ namespace fa {
         // call the call actor component and set the image texture
         m_TextureComponent.get()->SetTexture("PNG/player/walking_sprites/right_walk_1.png");
 
+        // start animations
+        m_TextureComponent.get()->LoadWalkingTextures();
 
 
-        // Load walking textures for right and left animations
-        //LoadTextures("PNG/player/walking_sprites/right_walk_", 9, m_RightWalkTextures);
-        //LoadTextures("PNG/player/walking_sprites/left_walk_", 9, m_LeftWalkTextures);
 
-        //// Set the initial texture
-        //if (!m_RightWalkTextures.empty()) {
-        //    m_Sprite.setTexture(m_RightWalkTextures[0]);
-        //}
 
-        //if(m_Sprite.getTexture())
-        //{
-        //    m_Sprite.setOrigin(m_Sprite.getTexture()->getSize().x / 2.f, m_Sprite.getTexture()->getSize().y / 2.f);
-        //}
 
         // Initialize physics
-        InitPhysics(owningWorld->GetB2World(), position);
+        //InitPhysics(owningWorld->GetB2World(), position);
     }
 
     void Player::LoadTextures(const std::string& prefix, int frameCount, std::vector<sf::Texture>& textures) {
@@ -81,82 +73,57 @@ namespace fa {
         }
     }
 
-    void Player::InitPhysics(b2World& world, const sf::Vector2f& position) {
-        b2BodyDef bodyDef;
-        bodyDef.type = b2_dynamicBody;
-        bodyDef.position.Set(PixelsToMeters(position.x), PixelsToMeters(position.y));
-        m_Body = world.CreateBody(&bodyDef);
-
-        b2PolygonShape dynamicBox;
-        dynamicBox.SetAsBox(PixelsToMeters(32.0f), PixelsToMeters(32.0f)); // Half-width and half-height
-
-        b2FixtureDef fixtureDef;
-        fixtureDef.shape = &dynamicBox;
-        fixtureDef.density = 1.0f;
-        fixtureDef.friction = 0.3f;
-        m_Body->CreateFixture(&fixtureDef);
-    }
-
     void Player::Update(float deltaTime) {
+        LOG("PLAYER UPDATING!");
+
         sf::Vector2f direction(0.0f, 0.0f);
 
-        // Detect movement input
+        // Handle input for movement
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) direction.y -= 1.0f;
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) direction.y += 1.0f;
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
-            direction.x -= 1.0f;
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) direction.x -= 1.0f;
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) direction.x += 1.0f;
 
-        }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
-            direction.x += 1.0f;
+        LOG("Current Direction: %f %f", direction.x, direction.y);
 
-        }
-
-        // Normalize direction
+        // Normalize direction (to ensure consistent speed)
         float magnitude = std::sqrt(direction.x * direction.x + direction.y * direction.y);
         if (magnitude > 0.0f) direction /= magnitude;
 
-        // Update Box2D velocity
-        float speed = 5.0f; // Speed in meters per second
-        b2Vec2 velocity(direction.x * speed, direction.y * speed);
-        m_Body->SetLinearVelocity(velocity);
-
-        // Handle animation updates
-        m_AnimationTimer += deltaTime;
-        if (m_AnimationTimer >= m_FrameDuration) {
-            m_AnimationTimer -= m_FrameDuration;
-
-            if (!m_RightWalkTextures.empty()) {
-                m_CurrentFrame = (m_CurrentFrame + 1) % m_RightWalkTextures.size();
-                m_Sprite.setTexture(m_RightWalkTextures[m_CurrentFrame]);
-            }
-            else if (!m_LeftWalkTextures.empty()) {
-                m_CurrentFrame = (m_CurrentFrame + 1) % m_LeftWalkTextures.size();
-                m_Sprite.setTexture(m_LeftWalkTextures[m_CurrentFrame]);
-            }
+        // Apply the velocity to the PhysicsComponent
+        if (m_PhysicsComponent) {
+            m_PhysicsComponent->HandleMovement(direction, deltaTime);  // Pass direction to PhysicsComponent
         }
 
-        // Update sprite position
-        b2Vec2 pos = m_Body->GetPosition();
-        m_Sprite.setPosition(MetersToPixels(pos.x), MetersToPixels(pos.y));
+        // Get the current position from the PhysicsComponent
+        sf::Vector2f physicsPosition = m_PhysicsComponent->GetPosition();
+
+        // Sync the sprite's position with the physics body (convert meters to pixels if necessary)
+        //LOG("POS X: %f, POSY: %f", physicsPosition.x, physicsPosition.y);
+        m_TextureComponent.get()->GetSprite().setPosition(physicsPosition.x, physicsPosition.y);
+
+
+        // Call the parent update
+        Actor::Update(deltaTime);
     }
 
     void Player::Render(sf::RenderWindow& window) {
-        // Render the sprite
-        window.draw(m_Sprite);
+
+        Actor::Render(window);
+
     }
 
 
 
     Player::~Player() {
 
-        //if (m_Body) {
-        //    b2World* world = m_Body->GetWorld();
-        //    if (world) {
-        //        world->DestroyBody(m_Body);
-        //    }
-        //    m_Body = nullptr; // Avoid dangling pointer
-        //}
+        if (m_Body) {
+            b2World* world = m_Body->GetWorld();
+            if (world) {
+                world->DestroyBody(m_Body);
+            }
+            m_Body = nullptr; // Avoid dangling pointer
+        }
 
 
     }

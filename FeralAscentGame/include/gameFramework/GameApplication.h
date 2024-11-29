@@ -20,7 +20,6 @@ namespace fa {
         void Run();
         void Initialize();
         void SetupDebug();
-        void InitializePlayer();
 
         void Update(float deltaTime);
         void Render();

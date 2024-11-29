@@ -20,8 +20,9 @@ namespace fa
 	}
 
 	// constructor
-	AssetManager::AssetManager() : m_rootDirectory{""}
+	AssetManager::AssetManager()
 	{
+		LOG("Root Directory : %s", m_rootDirectory.c_str());
 	}
 
 	shared<Texture> AssetManager::LoadTexture(const string& path)
@@ -65,5 +66,10 @@ namespace fa
 		m_rootDirectory = directory;
 
 	}
+
+	string AssetManager::GetAssetRootDirectory() const {
+		return m_rootDirectory;
+	}
+
 }
 

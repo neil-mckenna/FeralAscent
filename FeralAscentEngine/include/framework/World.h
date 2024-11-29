@@ -32,8 +32,11 @@ namespace fa {
         void Update(float dt);  // Custom updates
         void CleanCycle();  // Handle any pending destruction of actors
 
+        //
+        b2World* GetB2World();
+
         // Getter for Box2D world
-        b2World& GetB2World();
+
 
         // Window size for boundaries and calculations
         sf::Vector2u GetWindowSize() const;

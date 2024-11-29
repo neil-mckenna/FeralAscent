@@ -16,6 +16,7 @@ namespace fa
 		shared<Texture> LoadTexture(const string& path);
 		void CleanCycle();
 		void SetAssetRootDirectory(const string& directory);
+		string GetAssetRootDirectory() const;
 
 	protected:
 		AssetManager();
@@ -23,6 +24,9 @@ namespace fa
 	private:
 		static unique<AssetManager> assetManager;
 		Dictionary<string, shared<Texture>> m_LoadedTextureMap;
+
+		// Getter for the asset root directory
+
 
 		string m_rootDirectory;
 	};

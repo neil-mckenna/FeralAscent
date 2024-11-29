@@ -1,37 +1,51 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
-#include "framework/Component.h"
+#include <string>
+#include <vector>
+#include "Component.h"  // Include the header file for Component class
 
 namespace fa {
 
-    class TextureComponent : public Component {
+    class TextureComponent : public Component {  // Inherit from Component
     public:
+        // Constructor with a single texture path
+        explicit TextureComponent(const std::string& texturePath);
 
+        // Update the animation
+        void Update(float deltaTime) override;
 
-        // Constructor: Initialize with a texture path
-        TextureComponent(const std::string& texturePath);
-
-        // Override Update method (empty for now, could be extended for animations, etc.)
-        void Update(float dt) override;
-
-        // Override Render method to draw the sprite on the window
+        // Render the sprite to the window
         void Render(sf::RenderWindow& window) override;
 
-        // Set the texture to be used by the component
+        // Set the texture (for a single texture)
         void SetTexture(const std::string& texturePath);
 
-        // Getter for the texture
-        sf::Texture* GetTexture() { return m_Texture.get(); }
+        // Get the texture (for accessing it directly)
+        std::shared_ptr<sf::Texture> GetTexture() const;
 
+        // Get the sprite (for rendering)
         sf::Sprite& GetSprite();
 
+        // Load the walking animation textures
+        void LoadWalkingTextures();
+
     private:
-        // SFML Sprite to hold and render the texture
+        // Load multiple textures into a vector
+        void LoadTextures(const std::string& basePath, int numFrames, std::vector<sf::Texture>& textureVector);
+
+        // Texture for the sprite
+        std::shared_ptr<sf::Texture> m_Texture;
+
+        // Sprite to display the texture
         sf::Sprite m_Sprite;
 
-        // The texture to be used by the sprite
-        std::shared_ptr<sf::Texture> m_Texture;
+        // Animation-related variables
+        float m_AnimationTimer = 0.0f;
+        int m_CurrentFrame = 0;
+        float m_FrameDuration = 0.1f;  // Duration between frames
+        std::vector<sf::Texture> m_RightWalkTextures;  // Right walking animation textures
+        std::vector<sf::Texture> m_LeftWalkTextures;   // Left walking animation textures
     };
 
-}
+} // namespace fa

@@ -32,7 +32,7 @@ namespace fa {
     }
 
     void World::Update(float dt) {
-        LOG("World Updating");
+        //LOG("World Updating");
         UpdateInternal(dt);  // Call the internal update method for actors and physics
     }
 
@@ -66,8 +66,8 @@ namespace fa {
         m_pendingActors.clear();  // Clear the pending actors list
     }
 
-    b2World& World::GetB2World() {
-        return b2WorldInstance;  // Return the Box2D world instance
+    b2World* World::GetB2World() {
+        return &b2WorldInstance;  // Return a pointer to the Box2D world instance
     }
 
     sf::Vector2u World::GetWindowSize() const {

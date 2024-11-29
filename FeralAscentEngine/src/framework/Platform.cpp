@@ -30,13 +30,13 @@ namespace fa {
 
 
         // Access Box2D world directly
-        b2World& b2w = world->GetB2World();
+        b2World* b2w = world->GetB2World();
 
         // Initialize Box2D body
         b2BodyDef bodyDef;
         bodyDef.position.Set(PixelsToMeters(position.x), PixelsToMeters(position.y));
         bodyDef.type = b2_staticBody;
-        m_Body = b2w.CreateBody(&bodyDef);
+        m_Body = b2w->CreateBody(&bodyDef);
 
         b2PolygonShape boxShape;
         boxShape.SetAsBox(PixelsToMeters(size.x / 2.0f), PixelsToMeters(size.y / 2.0f)); // Half-size for Box2D

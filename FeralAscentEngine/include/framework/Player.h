@@ -23,8 +23,6 @@ namespace fa {
         void Render(sf::RenderWindow& window);
 
     private:
-        // Initialize Box2D physics for the player
-        void InitPhysics(b2World& world, const sf::Vector2f& position);
 
         // Load animation textures
         void LoadTextures(const std::string& prefix, int frameCount, std::vector<sf::Texture>& textures);
@@ -36,6 +34,7 @@ namespace fa {
         float m_AnimationTimer;                        // Timer to control frame changes
         float m_FrameDuration;                         // Duration of each frame
 
+        string m_PlayerTexturePath;
 
         // SFML sprite and texture
         sf::Sprite m_Sprite;

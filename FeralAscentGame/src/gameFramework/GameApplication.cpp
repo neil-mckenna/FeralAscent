@@ -25,21 +25,30 @@ namespace fa {
         m_BoundaryRight{ nullptr },
         m_BoundaryTop{ nullptr },
         m_BoundaryBottom{ nullptr },
-        m_World{ std::make_unique<World>(this, b2Vec2(0.0f, -9.8f)) },
-        m_Player{ std::make_unique<Player>(  // Initialize with make_unique
-          nullptr,  // Pass m_World or nullptr if needed
-          sf::Vector2f(this->GetWindowSize().x / 2.f, 100.f),  // Center of the screen
-          "PNG/player/walking_sprites/right_walk_1.png"  // Path to texture
-        ) },
+        m_World{ std::make_unique<World>(this, b2Vec2(0.0f, -9.8f)) }, // initialize world with gravity
+        m_Player{ nullptr },
 
         m_GroundPlatform{ nullptr }  // Initialize the ground platform pointer
 
     {
-
         LOG("Game Application Constructor Started");
 
         AssetManager::Get().SetAssetRootDirectory(GetResourceDir());
         LOG("Asset root directory set to: %s", GetResourceDir().c_str());
+
+        LOG("Window Size: %d %d", GetWindowSize().x, GetWindowSize().y);
+
+        // create player
+        m_Player = std::make_unique<Player>(  // Initialize with make_unique
+          m_World.get(),  // Pass m_World or nullptr if needed
+          sf::Vector2f(GetWindowSize().x / 2.f, 100.f),  // Center of the screen
+          "PNG/player/walking_sprites/right_walk_1.png"  // Path to texture
+        );
+
+        // add player to actors list
+        m_World->AddActor(m_Player.get());
+
+
 
         LOG("Game Application Constructor Completed");
 
@@ -54,12 +63,12 @@ namespace fa {
         float windowHeight = 768.0f;
         float boundaryThickness = 10.0f;
 
-        //m_BoundaryLeft = std::make_unique<Platform>(
-        //    m_World.get(),
-        //    sf::Vector2f(0, windowHeight / 2),  // Position
-        //    sf::Vector2f(boundaryThickness, windowHeight),  // Size
-        //    "assets/PNG/terrain/land_sprites/tile000.png"  // Texture
-        //);
+        m_BoundaryLeft = std::make_unique<Platform>(
+            m_World.get(),
+            sf::Vector2f(0, windowHeight / 2),  // Position
+            sf::Vector2f(boundaryThickness, windowHeight),  // Size
+            "assets/PNG/terrain/land_sprites/tile000.png"  // Texture
+        );
 
         //m_BoundaryRight = std::make_unique<Platform>(
         //    m_World.get(),
@@ -117,7 +126,7 @@ namespace fa {
         SetupDebug();
 
         // Initialize boundaries to keep player inside the screen
-        //InitBoundaries();
+        InitBoundaries();
 
         //InitializePlayer();
 
@@ -153,48 +162,13 @@ namespace fa {
         m_DebugDraw.SetFlags(debugFlags);
 
         // Initialize debug draw for Box2D
-        m_World->GetB2World().SetDebugDraw(&m_DebugDraw);
+        m_World->GetB2World()->SetDebugDraw(&m_DebugDraw);
     }
-
-    void GameApplication::InitializePlayer()
-    {
-        LOG("Game Application: Initialize Player");
-
-        LOG("BEFORE: m_World: %p, m_Player: %p", m_World.get(), m_Player.get());
-
-        // Initialize the player at a starting position
-        m_Player = make_unique<Player>(
-            m_World.get(),
-            sf::Vector2f(this->GetWindowSize().x / 2.f, 100.f), // Center of the screen
-            "PNG/player/walking_sprites/right_walk_1.png"
-        );
-
-        LOG("AFTER: m_World: %p, m_Player: %p", m_World.get(), m_Player.get());
-
-        if (!m_Player) {
-            LOG("Failed to initialize player. %p", m_Player.get() );
-        }
-        else {
-            LOG("Accessing m_World %p", m_World.get());
-
-            try {
-                // Use std::move to transfer ownership of the unique_ptr to the World
-                m_World.get()->AddActor(std::move(m_Player));
-            }
-            catch (const std::exception& e) {
-                LOG_ERROR("Exception caught: %s", e.what());
-            }
-        }
-
-        // Ensure m_NewPlayer is now null and no longer holding the player object
-        LOG("AFTER Move: m_World: %p, m_Player: %p", m_World.get(), m_Player.get());
-    }
-
 
 
     void GameApplication::Update(float deltaTime)
     {
-        LOG("Game Application: Updating");
+        //LOG("Game Application: Updating");
 
 
 
@@ -204,27 +178,21 @@ namespace fa {
 
 
         // Update player movement
-        if (m_Player) {
-            m_Player->Update(deltaTime);
+        //LOG("Player  %p", m_Player.get());
+        if (m_Player.get()) {
+            m_Player.get()->Update(deltaTime);
         }
     }
 
     void GameApplication::Render()
     {
-        LOG("Game Application: Rendering");
+        //LOG("Game Application: Rendering");
 
         m_Window.clear(sf::Color::White);  // Clear the screen with white background
 
+        // call world, then actors, then texture component render
         m_World->Render(m_Window);  // Render the world and all its actors
 
-        if (m_Player.get()) {
-            LOG("found player");
-            m_Player->Render(m_Window);  // Render the player
-        }
-        else
-        {
-            LOG_ERROR("No player %p", m_Player.get());
-        }
 
         //if (m_GroundPlatform) {
         //    m_GroundPlatform->Render(m_Window);  // Render the ground platform
@@ -263,6 +231,12 @@ namespace fa {
         if (m_World) {
             m_World->ClearAllActors();  // Manually clear any remaining actors
             m_World.reset();        // Optionally clear Box2D and other resources
+        }
+
+
+        if (m_Player)
+        {
+            m_Player.reset();
         }
     }
 }

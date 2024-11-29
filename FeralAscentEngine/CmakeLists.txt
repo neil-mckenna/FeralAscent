@@ -1,8 +1,5 @@
 add_library(${FERAL_ASCENT_ENGINE_TARGET_NAME} STATIC
 
-	${CMAKE_CURRENT_SOURCE_DIR}/include/EntryPoint.h
-	${CMAKE_CURRENT_SOURCE_DIR}/src/EntryPoint.cpp
-
 	${CMAKE_CURRENT_SOURCE_DIR}/include/framework/Actor.h
 	${CMAKE_CURRENT_SOURCE_DIR}/src/framework/Actor.cpp
 
@@ -12,8 +9,28 @@ add_library(${FERAL_ASCENT_ENGINE_TARGET_NAME} STATIC
 	${CMAKE_CURRENT_SOURCE_DIR}/include/framework/AssetManager.h
 	${CMAKE_CURRENT_SOURCE_DIR}/src/framework/AssetManager.cpp
 
+	${CMAKE_CURRENT_SOURCE_DIR}/include/framework/Boundary.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/framework/Boundary.cpp
+
+	${CMAKE_CURRENT_SOURCE_DIR}/include/framework/Component.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/framework/Component.cpp
+
 	${CMAKE_CURRENT_SOURCE_DIR}/include/framework/Core.h
 	${CMAKE_CURRENT_SOURCE_DIR}/src/framework/Core.cpp
+
+	${CMAKE_CURRENT_SOURCE_DIR}/include/framework/DebugDraw.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/framework/DebugDraw.cpp
+
+	${CMAKE_CURRENT_SOURCE_DIR}/include/framework/Uni/entity.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/framework/Uni/entity.cpp
+
+	${CMAKE_CURRENT_SOURCE_DIR}/include/EntryPoint.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/EntryPoint.cpp
+
+	${CMAKE_CURRENT_SOURCE_DIR}/include/framework/LevelSystem.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/framework/LevelSystem.cpp
+
+	${CMAKE_CURRENT_SOURCE_DIR}/include/framework/Uni/maths.h
 
 	${CMAKE_CURRENT_SOURCE_DIR}/include/framework/MathUtility.h
 	${CMAKE_CURRENT_SOURCE_DIR}/src/framework/MathUtility.cpp
@@ -21,44 +38,26 @@ add_library(${FERAL_ASCENT_ENGINE_TARGET_NAME} STATIC
 	${CMAKE_CURRENT_SOURCE_DIR}/include/framework/Object.h
 	${CMAKE_CURRENT_SOURCE_DIR}/src/framework/Object.cpp
 
-
-	${CMAKE_CURRENT_SOURCE_DIR}/include/framework/World.h
-	${CMAKE_CURRENT_SOURCE_DIR}/src/framework/World.cpp
-
-	${CMAKE_CURRENT_SOURCE_DIR}/include/framework/Boundary.h
-	${CMAKE_CURRENT_SOURCE_DIR}/src/framework/Boundary.cpp
-
-	${CMAKE_CURRENT_SOURCE_DIR}/include/framework/DebugDraw.h
-	${CMAKE_CURRENT_SOURCE_DIR}/src/framework/DebugDraw.cpp
-
-	${CMAKE_CURRENT_SOURCE_DIR}/include/framework/LevelSystem.h
-	${CMAKE_CURRENT_SOURCE_DIR}/src/framework/LevelSystem.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/include/framework/PhysicsComponent.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/framework/PhysicsComponent.cpp
 
 	${CMAKE_CURRENT_SOURCE_DIR}/include/framework/Platform.h
 	${CMAKE_CURRENT_SOURCE_DIR}/src/framework/Platform.cpp
 
-	${CMAKE_CURRENT_SOURCE_DIR}/include/framework/RayCastCallback.h
-	${CMAKE_CURRENT_SOURCE_DIR}/src/framework/RayCastCallback.cpp
-
 	${CMAKE_CURRENT_SOURCE_DIR}/include/framework/Player.h
 	${CMAKE_CURRENT_SOURCE_DIR}/src/framework/Player.cpp
 
-	${CMAKE_CURRENT_SOURCE_DIR}/include/framework/Component.h
-	${CMAKE_CURRENT_SOURCE_DIR}/src/framework/Component.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/include/framework/RayCastCallback.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/framework/RayCastCallback.cpp
 
 	${CMAKE_CURRENT_SOURCE_DIR}/include/framework/TextureComponent.h
 	${CMAKE_CURRENT_SOURCE_DIR}/src/framework/TextureComponent.cpp
 
-	${CMAKE_CURRENT_SOURCE_DIR}/include/framework/PhysicsComponent.h
-	${CMAKE_CURRENT_SOURCE_DIR}/src/framework/PhysicsComponent.cpp
-
 	${CMAKE_CURRENT_SOURCE_DIR}/include/framework/Utilities.h
 
-	${CMAKE_CURRENT_SOURCE_DIR}/include/framework/Uni/entity.h
-	${CMAKE_CURRENT_SOURCE_DIR}/src/framework/Uni/entity.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/include/framework/World.h
+	${CMAKE_CURRENT_SOURCE_DIR}/src/framework/World.cpp
 
-
-	${CMAKE_CURRENT_SOURCE_DIR}/include/framework/Uni/maths.h
 
 
 )

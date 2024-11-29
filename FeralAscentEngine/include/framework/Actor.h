@@ -1,47 +1,66 @@
 #pragma once
 
-#include <vector>
-#include <memory>
 #include "framework/Component.h"
 #include "framework/TextureComponent.h"
 #include "framework/PhysicsComponent.h"
-
-using namespace std;
-using namespace sf;
-
+#include <SFML/Graphics.hpp>
+#include <memory>
+#include <vector>
 
 namespace fa {
 
-    class World;
+    class World;  // Forward declaration of World class
+
     class Actor {
     public:
+        // Constructor
         Actor(World* owningWorld, const sf::Vector2f& position, const std::string& texturePath);
-        virtual ~Actor();
 
-        // Update the actor and all of its components
-        virtual void Update(float dt);
-        virtual void Render(RenderWindow& window);
+        // Destructor
+        ~Actor();
 
-        // Add components to the actor
-        void AddComponent(shared_ptr<Component> component);
+        // Update the actor's components
+        void Update(float dt);
 
-        // Access components
-        template<typename T>
+        // Render the actor's components
+        void Render(sf::RenderWindow& window);
+
+        // Add a component to the actor
+        void AddComponent(std::shared_ptr<Component> component);
+
+        // Get a component of a specific type
+        template <typename T>
         T* GetComponent() const;
 
-    protected:
-        string m_ActorName; // hold the path string temporary
-        shared_ptr<TextureComponent> m_TextureComponent;  // Texture component
-        shared_ptr<PhysicsComponent> m_PhysicsComponent;  // Physics component
-        vector<shared_ptr<Component>> m_Components;  // Store components
-        void InitializeComponents(const std::string& texturePath);  // Initialize components in the actor
+        // Handle movement by passing velocity externally
+        void HandleMovement(const sf::Vector2f& velocity, float dt);
 
+    protected:
+        // Components of the actor
+        std::shared_ptr<TextureComponent> m_TextureComponent;
+        std::shared_ptr<PhysicsComponent> m_PhysicsComponent;
+
+        // Actor's position in world space
+        sf::Vector2f m_Position;
+
+        // Actor's name (for debugging)
+        std::string m_ActorName;
 
     private:
-        World* m_owningWorld;  // Pointer to the owning world
-        Vector2f m_Position;  // Position of the actor
-        string m_TexturePath; // hold the path string temporary
+        // Initialize the actor's components
+        void InitializeComponents(const std::string& texturePath);
+
+        // The world this actor belongs to
+        World* m_owningWorld;
+
+
+        // Path to the texture used for the actor
+        std::string m_TexturePath;
+
+
+        // Vector of all components (renderable, physics, etc.)
+        std::vector<std::shared_ptr<Component>> m_Components;
 
     };
 
-}
+}  // namespace fa
