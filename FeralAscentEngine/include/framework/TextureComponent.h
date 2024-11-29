@@ -28,9 +28,14 @@ namespace fa {
         sf::Sprite& GetSprite();
 
         // Load the walking animation textures
-        void LoadWalkingTextures();
+        void LoadPlayerWalkingTextures();
+
+        // single file load
+        void TextureComponent::LoadTexture(const std::string& texturePath);
 
     private:
+
+
         // Load multiple textures into a vector
         void LoadTextures(const std::string& basePath, int numFrames, std::vector<sf::Texture>& textureVector);
 

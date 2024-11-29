@@ -36,7 +36,8 @@ namespace fa {
         m_CurrentFrame(0),
         m_AnimationTimer(0.0f),
         m_FrameDuration(0.1f),
-        m_PlayerTexturePath(texturePath)
+        m_PlayerTexturePath(texturePath),
+        m_Body{}
 
     {
         LOG("Player Constructor: owningWorld=%p, position=(%f, %f), texturePath=%s",
@@ -54,14 +55,9 @@ namespace fa {
         m_TextureComponent.get()->SetTexture("PNG/player/walking_sprites/right_walk_1.png");
 
         // start animations
-        m_TextureComponent.get()->LoadWalkingTextures();
+        m_TextureComponent.get()->LoadPlayerWalkingTextures();
 
 
-
-
-
-        // Initialize physics
-        //InitPhysics(owningWorld->GetB2World(), position);
     }
 
     void Player::LoadTextures(const std::string& prefix, int frameCount, std::vector<sf::Texture>& textures) {
@@ -74,7 +70,7 @@ namespace fa {
     }
 
     void Player::Update(float deltaTime) {
-        LOG("PLAYER UPDATING!");
+        //LOG("PLAYER UPDATING!");
 
         sf::Vector2f direction(0.0f, 0.0f);
 
@@ -84,7 +80,7 @@ namespace fa {
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) direction.x -= 1.0f;
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) direction.x += 1.0f;
 
-        LOG("Current Direction: %f %f", direction.x, direction.y);
+        //LOG("Current Direction: %f %f", direction.x, direction.y);
 
         // Normalize direction (to ensure consistent speed)
         float magnitude = std::sqrt(direction.x * direction.x + direction.y * direction.y);

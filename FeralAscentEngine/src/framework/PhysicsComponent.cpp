@@ -35,7 +35,7 @@ namespace fa {
 
         // Define the shape of the body (e.g., a circle shape)
         b2CircleShape circleShape;
-        circleShape.m_radius = 10.0f;  // Set the radius of the circle for the body
+        circleShape.m_radius = 20.0f;  // Set the radius of the circle for the body
 
         // Define the fixture (physical properties like density and friction)
         b2FixtureDef fixtureDef;

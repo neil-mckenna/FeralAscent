@@ -57,7 +57,7 @@ namespace fa {
     }
 
     // Load walking textures for right and left animations
-    void TextureComponent::LoadWalkingTextures() {
+    void TextureComponent::LoadPlayerWalkingTextures() {
         LOG("ANIMATIONG");
 
         LoadTextures("PNG/player/walking_sprites/right_walk_", 9, m_RightWalkTextures);
@@ -72,6 +72,18 @@ namespace fa {
             m_Sprite.setOrigin(m_Sprite.getTexture()->getSize().x / 2.f, m_Sprite.getTexture()->getSize().y / 2.f);
         }
     }
+
+    void TextureComponent::LoadTexture(const std::string& texturePath) {
+        auto texture = AssetManager::Get().LoadTexture(texturePath);  // Load texture as a shared pointer
+
+        if (texture) {
+            m_Texture = texture;  // Store the texture
+        }
+        else {
+            LOG("Failed to load texture: %s", texturePath.c_str());
+        }
+    }
+
 
     // Helper method to load textures into a vector
     void TextureComponent::LoadTextures(const std::string& basePath, int numFrames, std::vector<sf::Texture>& textureVector) {

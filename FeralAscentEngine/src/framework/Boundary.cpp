@@ -1,32 +1,49 @@
 #include "framework/Boundary.h"
+#include "framework/Actor.h"
+#include "framework/Core.h"
 
 namespace fa {
 
     // Constructor implementation
-    Boundary::Boundary(b2World& world, const sf::Vector2f& position, const sf::Vector2f& size)
-        : position(position), size(size) { // Initialize position and size
-        b2BodyDef bodyDef;
-        bodyDef.position.Set(position.x / SCALE, position.y / SCALE); // Convert position to Box2D scale
-        bodyDef.type = b2_staticBody;  // Static body for walls
-        body = world.CreateBody(&bodyDef);
+    Boundary::Boundary(World* world, const sf::Vector2f& position, const sf::Vector2f& size, const std::string& texturePath) :
 
-        b2PolygonShape boxShape;
-        boxShape.SetAsBox((size.x / 2.0f) / SCALE, (size.y / 2.0f) / SCALE);  // Convert size to Box2D scale
+        Actor(world, position, texturePath),
+        m_Position{ position },
+        m_Size{ size },
+        m_TextureComponent{ texturePath },
+        m_body{}
+    {
 
-        b2FixtureDef fixtureDef;
-        fixtureDef.shape = &boxShape;
-        fixtureDef.friction = 0.5f; // Adjust friction as necessary
-        body->CreateFixture(&fixtureDef);
+        LOG("Boundary Created at postion x=%f, y=%f ", position.x, position.y);
+
+        // attempt to load a sprite
+        // Ensure the texture component exists and has a valid texture
+        if (m_TextureComponent.GetTexture()) {
+            sf::Texture* texture = m_TextureComponent.GetTexture().get();
+            m_TextureComponent.GetSprite().setTexture(*texture);
+            m_TextureComponent.GetSprite().setOrigin(texture->getSize().x / 2.f, texture->getSize().y / 2.f);
+        }
+        else {
+            LOG_ERROR("Boundary Texture component is missing or texture is not set.");
+        }
     }
 
-    // Render implementation
-    void Boundary::render(sf::RenderWindow& window) {
-        sf::RectangleShape boundaryShape(size);  // Use size directly
-        boundaryShape.setFillColor(sf::Color::Transparent);  // Transparent fill
-        boundaryShape.setOutlineThickness(2);
-        boundaryShape.setOutlineColor(sf::Color::Red);       // Red outline for debugging
-        boundaryShape.setPosition(position);                // Use position
-        window.draw(boundaryShape);
+    // Render the boundary
+    void Boundary::Render(sf::RenderWindow& window)
+    {
+        LOG("Boundary Updating");
+        Actor::Render(window);
+
+
+
+
     }
 
-} // namespace Platty
+    // Update the boundary (e.g., for animated textures)
+    void Boundary::Update(float deltaTime) {
+        //m_TextureComponent.Update(deltaTime);
+
+        m_TextureComponent.GetSprite().setPosition(m_Position.x, m_Position.y);
+    }
+
+} // namespace fa

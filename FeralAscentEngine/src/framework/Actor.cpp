@@ -54,6 +54,8 @@ namespace fa {
         for (auto& component : m_Components) {
             component->Update(dt);
         }
+
+
     }
 
     // Render the actor's components

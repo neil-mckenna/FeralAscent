@@ -5,6 +5,7 @@
 #include "framework/World.h"
 #include "framework/Player.h"
 #include "framework/Platform.h"
+#include "framework/Boundary.h"
 #include "framework/DebugDraw.h"
 #include "framework/Core.h"
 
@@ -47,10 +48,11 @@ namespace fa {
         unique<Platform> m_GroundPlatform;
 
         // Boundaries (platforms acting as walls)
-        unique<Platform> m_BoundaryLeft;
-        unique<Platform> m_BoundaryRight;
-        unique<Platform> m_BoundaryTop;
-        unique<Platform> m_BoundaryBottom;
+        unique<Boundary> m_BoundaryLeft;
+        unique<Boundary> m_BoundaryRight;
+        unique<Boundary> m_BoundaryTop;
+        unique<Boundary> m_BoundaryBottom;
+        unique<Boundary> m_BoundaryCenter;
 
 
 

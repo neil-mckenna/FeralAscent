@@ -38,7 +38,7 @@ namespace fa {
 
     void World::UpdateInternal(float dt) {
         // Update all actors and Box2D world
-        LOG("Amount of Actors: %zu", m_Actors.size());
+        //LOG("Amount of Actors: %zu", m_Actors.size());
 
         for (auto& actor : m_Actors) {
             actor->Update(dt);  // Update each actor
@@ -53,6 +53,8 @@ namespace fa {
         for (auto& actor : m_Actors) {
             actor->Render(window);  // Render each actor to the window
         }
+
+
     }
 
     void World::CleanCycle() {

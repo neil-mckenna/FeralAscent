@@ -25,7 +25,8 @@ namespace fa {
         m_BoundaryRight{ nullptr },
         m_BoundaryTop{ nullptr },
         m_BoundaryBottom{ nullptr },
-        m_World{ std::make_unique<World>(this, b2Vec2(0.0f, -9.8f)) }, // initialize world with gravity
+        m_BoundaryCenter{ nullptr },
+        m_World{ std::make_unique<World>(this, b2Vec2(0.0f, 9.8f)) }, // initialize world with gravity
         m_Player{ nullptr },
 
         m_GroundPlatform{ nullptr }  // Initialize the ground platform pointer
@@ -61,42 +62,57 @@ namespace fa {
 
         float windowWidth = 1024.0f;
         float windowHeight = 768.0f;
-        float boundaryThickness = 10.0f;
+        float boundaryThickness = 30.0f;
 
-        m_BoundaryLeft = std::make_unique<Platform>(
+        m_BoundaryLeft = std::make_unique<Boundary>(
             m_World.get(),
             sf::Vector2f(0, windowHeight / 2),  // Position
             sf::Vector2f(boundaryThickness, windowHeight),  // Size
-            "assets/PNG/terrain/land_sprites/tile000.png"  // Texture
+            "PNG/terrain/land_sprites/tile000.png"  // Texture
         );
 
-        //m_BoundaryRight = std::make_unique<Platform>(
-        //    m_World.get(),
-        //    sf::Vector2f(windowWidth - boundaryThickness, windowHeight / 2),
-        //    sf::Vector2f(boundaryThickness, windowHeight),
-        //    "assets/PNG/terrain/land_sprites/tile000.png"
-        //);
 
-        //m_BoundaryTop = std::make_unique<Platform>(
-        //    m_World.get(),
-        //    sf::Vector2f(windowWidth / 2, 0),
-        //    sf::Vector2f(windowWidth, boundaryThickness),
-        //    "assets/PNG/terrain/land_sprites/tile000.png"
-        //);
+        m_BoundaryRight = std::make_unique<Boundary>(
+            m_World.get(),
+            sf::Vector2f(windowWidth - boundaryThickness, windowHeight / 2),
+            sf::Vector2f(boundaryThickness, windowHeight),
+            "PNG/terrain/land_sprites/tile000.png"
+        );
 
-        //m_BoundaryBottom = std::make_unique<Platform>(
-        //    m_World.get(),
-        //    sf::Vector2f(windowWidth / 2, windowHeight - boundaryThickness),
-        //    sf::Vector2f(windowWidth, boundaryThickness),
-        //    "assets/PNG/terrain/land_sprites/tile000.png"
-        //);
+        m_BoundaryTop = std::make_unique<Boundary>(
+            m_World.get(),
+            sf::Vector2f(windowWidth / 2, 0),
+            sf::Vector2f(windowWidth, boundaryThickness),
+            "PNG/terrain/land_sprites/tile000.png"
+        );
+
+        m_BoundaryBottom = std::make_unique<Boundary>(
+            m_World.get(),
+            sf::Vector2f(windowWidth / 2, windowHeight - boundaryThickness),
+            sf::Vector2f(windowWidth, boundaryThickness),
+            "PNG/terrain/land_sprites/tile000.png"
+        );
+
+        m_BoundaryCenter = std::make_unique<Boundary>(
+            m_World.get(),
+            sf::Vector2f(windowWidth / 2.f, windowHeight  / 2.f),
+            sf::Vector2f(60.f, 60.f),
+            "PNG/terrain/land_sprites/tile000.png"
+        );
+
+        m_World.get()->AddActor(m_BoundaryLeft.get());
+        m_World.get()->AddActor(m_BoundaryRight.get());
+        m_World.get()->AddActor(m_BoundaryTop.get());
+        m_World.get()->AddActor(m_BoundaryBottom.get());
+
+        m_World.get()->AddActor(m_BoundaryCenter.get());
     }
 
 
 
     void GameApplication::Run() {
 
-        LOG("Game Application Running");
+        //LOG("Game Application Running");
 
         Initialize();
 
@@ -140,13 +156,6 @@ namespace fa {
             "assets/PNG/terrain/land_sprites/tile000.png"
         );*/
 
-        // Add player to the world, cast Player to Actor
-        //m_World->AddActor(move(m_Player.get()));  // Player is now a make_unique<Actor>
-
-        //m_World->AddActor(m_BoundaryTop.get());
-        //m_World->AddActor(m_BoundaryLeft.get());
-        //m_World->AddActor(m_BoundaryRight.get());
-        //m_World->AddActor(m_BoundaryBottom.get());
 
     }
 
@@ -170,8 +179,6 @@ namespace fa {
     {
         //LOG("Game Application: Updating");
 
-
-
         m_Counter += deltaTime;
 
         m_World->Update(deltaTime);  // Update Box2D world (e.g., physics)
@@ -181,6 +188,42 @@ namespace fa {
         //LOG("Player  %p", m_Player.get());
         if (m_Player.get()) {
             m_Player.get()->Update(deltaTime);
+        }
+
+        if (m_BoundaryLeft.get())
+        {
+            //LOG("Boundary Left %p ", m_BoundaryLeft.get());
+            m_BoundaryLeft.get()->Update(deltaTime);
+            m_BoundaryLeft.get()->Render(m_Window);
+        }
+
+        if (m_BoundaryRight.get())
+        {
+            //LOG("Boundary Right %p ", m_BoundaryRight.get());
+            m_BoundaryRight.get()->Update(deltaTime);
+
+        }
+
+        if (m_BoundaryTop.get())
+        {
+            //LOG("Boundary Top %p ", m_BoundaryTop.get());
+            m_BoundaryTop.get()->Update(deltaTime);
+
+        }
+
+
+        if (m_BoundaryBottom.get())
+        {
+            //LOG("Boundary Bottom %p ", m_BoundaryBottom.get());
+            m_BoundaryBottom.get()->Update(deltaTime);
+
+        }
+
+        if (m_BoundaryCenter.get())
+        {
+            //LOG("Boundary Center %p ", m_BoundaryCenter.get());
+            m_BoundaryCenter.get()->Update(deltaTime);
+
         }
     }
 
@@ -221,15 +264,15 @@ namespace fa {
 
         LOG("Game Application: Deconstructor");
 
-        if (m_World) {
+        if (m_World.get()) {
             LOG("m_World exists before destruction: %p", m_World.get());
         }
         else {
             LOG("m_World is nullptr");
         }
 
-        if (m_World) {
-            m_World->ClearAllActors();  // Manually clear any remaining actors
+        if (m_World.get()) {
+            m_World.get()->ClearAllActors();  // Manually clear any remaining actors
             m_World.reset();        // Optionally clear Box2D and other resources
         }
 
